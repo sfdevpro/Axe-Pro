@@ -7,11 +7,7 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
-    body {
-      background: #fff;
-      color: #111;
-      font-family: 'Segoe UI', Arial, sans-serif;
-    }
+    body { background: #f5f5f5; color: #111; font-family: 'Segoe UI', Arial, sans-serif; }
 
     /* PAGE LOADER */
     .page-loader {
@@ -21,257 +17,206 @@
     }
     .page-loader .sp {
       width: 32px; height: 32px;
-      border: 2px solid #eee; border-top-color: #111;
+      border: 3px solid #ffe0e0; border-top-color: #ff4747;
       border-radius: 50%; animation: spin 0.7s linear infinite;
     }
-    .page-loader p { font-size: 12px; color: #aaa; letter-spacing: 1px; text-transform: uppercase; }
+    .page-loader p { font-size: 12px; color: #ff4747; font-weight: 600; letter-spacing: 0.5px; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    /* TOPBAR */
-    .topbar {
-      background: #fff; border-bottom: 1px solid #f0f0f0;
-      padding: 12px 16px; display: none;
-      align-items: center; justify-content: space-between;
+    /* HEADER */
+    .t-header {
+      background: #ff4747; padding: 10px 14px;
+      display: flex; align-items: center; justify-content: space-between;
       position: sticky; top: 0; z-index: 100;
     }
-    .topbar-logo { font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; color: #111; }
-    .lang-toggle { display: flex; gap: 0; align-items: center; }
+    .t-logo { font-size: 15px; font-weight: 800; color: #fff; letter-spacing: 1px; }
+    .lang-toggle { display: flex; background: rgba(255,255,255,0.2); border-radius: 20px; overflow: hidden; }
     .lang-btn {
-      font-size: 11px; font-weight: 600; letter-spacing: 0.5px;
-      background: transparent; border: none; cursor: pointer;
-      color: #aaa; padding: 4px 8px; font-family: inherit;
+      font-size: 11px; font-weight: 700; background: transparent; border: none;
+      cursor: pointer; color: rgba(255,255,255,0.7); padding: 5px 11px; font-family: inherit;
     }
-    .lang-btn.active { color: #111; border-bottom: 1.5px solid #111; }
-    .lang-sep { font-size: 10px; color: #ddd; }
+    .lang-btn.active { background: #fff; color: #ff4747; border-radius: 20px; }
 
     /* COUNTDOWN */
-    .countdown-wrap { background: #111; padding: 8px 0; text-align: center; }
+    .countdown-wrap { background: #c62828; padding: 7px 12px; display: none; }
     .countdown-inner {
-      font-size: 11px; color: #fff; letter-spacing: 1px;
-      text-transform: uppercase; display: flex; align-items: center;
-      justify-content: center; gap: 8px;
+      font-size: 11px; font-weight: 700; color: #fff; letter-spacing: 0.5px;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
     }
-    .cd-box { font-weight: 700; font-size: 13px; min-width: 24px; }
+    .cd-box {
+      background: #fff; color: #ff4747; font-size: 12px; font-weight: 800;
+      padding: 2px 7px; border-radius: 4px; min-width: 24px; text-align: center;
+    }
 
-    /* IMAGE PRINCIPALE */
-    .product-img-wrap { position: relative; background: #f5f5f5; }
-    .product-img-wrap img {
-      width: 100%; height: 320px; object-fit: cover;
+    /* IMAGE */
+    .product-img { position: relative; background: #fff; }
+    .product-img img {
+      width: 100%; height: 300px; object-fit: cover;
       display: block; cursor: zoom-in;
     }
-    .img-badge {
-      position: absolute; top: 14px; left: 14px;
-      background: #111; color: #fff;
-      font-size: 9px; font-weight: 700; letter-spacing: 1.5px;
-      text-transform: uppercase; padding: 4px 10px;
+    .img-badge-new {
+      position: absolute; top: 10px; left: 10px;
+      background: #ff4747; color: #fff;
+      font-size: 9px; font-weight: 800; padding: 3px 9px;
+      border-radius: 4px; letter-spacing: 0.5px;
     }
-    .img-badge-promo {
-      position: absolute; top: 14px; right: 14px;
-      background: #e53935; color: #fff;
-      font-size: 9px; font-weight: 700; letter-spacing: 0.5px;
-      padding: 4px 10px;
+    .img-badge-pct {
+      position: absolute; top: 10px; right: 10px;
+      background: #ff9800; color: #fff;
+      font-size: 13px; font-weight: 800; padding: 4px 9px; border-radius: 4px;
+    }
+    .img-sold {
+      position: absolute; bottom: 10px; left: 10px;
+      background: rgba(0,0,0,0.55); color: #fff;
+      font-size: 10px; font-weight: 600; padding: 3px 9px; border-radius: 4px;
     }
 
-    /* THUMBNAILS */
+    /* THUMBS */
     .thumbs-row {
-      display: flex; gap: 4px; padding: 8px 12px;
-      background: #fff; border-bottom: 1px solid #f0f0f0;
-      overflow-x: auto;
+      display: flex; gap: 6px; padding: 10px 12px;
+      background: #fff; border-bottom: 4px solid #f5f5f5; overflow-x: auto;
     }
     .thumbs-row::-webkit-scrollbar { height: 2px; }
-    .thumbs-row::-webkit-scrollbar-thumb { background: #ddd; }
     .thumb {
-      width: 52px; height: 52px; flex-shrink: 0;
-      overflow: hidden; cursor: pointer;
-      border: 1.5px solid transparent; transition: border-color 0.15s;
+      width: 52px; height: 52px; border-radius: 8px; overflow: hidden;
+      flex-shrink: 0; cursor: pointer; border: 2px solid transparent; transition: border-color 0.15s;
     }
-    .thumb.active { border-color: #111; }
+    .thumb.active { border-color: #ff4747; }
     .thumb img { width: 100%; height: 100%; object-fit: cover; }
 
     /* PRODUCT INFO */
-    .product-info { padding: 16px; border-bottom: 1px solid #f0f0f0; }
-    .product-ref { font-size: 10px; color: #aaa; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 6px; }
-    .product-name { font-size: 18px; font-weight: 600; color: #111; letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 10px; line-height: 1.3; }
-    .product-sub { font-size: 12px; color: #888; margin-bottom: 12px; line-height: 1.5; }
-    .price-row { display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap; }
-    .price-current { font-size: 22px; font-weight: 700; color: #111; }
-    .price-old { font-size: 14px; color: #bbb; text-decoration: line-through; }
-    .price-save { font-size: 12px; color: #e53935; font-weight: 600; }
+    .product-info { background: #fff; padding: 12px 14px; margin-bottom: 4px; }
+    .price-main { font-size: 24px; font-weight: 800; color: #ff4747; margin-bottom: 4px; display: flex; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+    .price-old { font-size: 13px; color: #bbb; text-decoration: line-through; font-weight: 400; }
+    .price-save { font-size: 12px; color: #ff9800; font-weight: 700; }
+    .product-name { font-size: 15px; font-weight: 700; color: #111; margin: 8px 0 4px; line-height: 1.3; }
+    .product-sub { font-size: 12px; color: #888; margin-bottom: 8px; line-height: 1.5; }
+    .stars-row { display: flex; align-items: center; gap: 6px; margin-bottom: 10px; }
+    .stars { color: #ff9800; font-size: 13px; }
+    .reviews { font-size: 11px; color: #888; }
+    .tags-row { display: flex; gap: 6px; flex-wrap: wrap; }
+    .tag { font-size: 10px; padding: 3px 9px; border-radius: 4px; font-weight: 700; }
+    .tag-red { background: #fff0f0; color: #ff4747; }
+    .tag-orange { background: #fff8e1; color: #e65100; }
+    .tag-green { background: #e8f5e9; color: #2e7d32; }
 
-    /* LAYOUT PAGE */
-    .page { max-width: 600px; margin: 0 auto; background: #fff; }
-
-    /* SECTION FORMULAIRE */
-    .form-section { padding: 20px 16px; border-bottom: 1px solid #f0f0f0; }
-    .form-section-title {
-      font-size: 10px; font-weight: 700; color: #111;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 14px; padding-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
+    /* CARDS */
+    .t-card { background: #fff; padding: 14px; margin-bottom: 4px; }
+    .card-title {
+      font-size: 13px; font-weight: 700; color: #111; margin-bottom: 12px;
+      display: flex; align-items: center; gap: 8px;
     }
+    .card-title::before { content: ''; width: 3px; height: 15px; background: #ff4747; border-radius: 2px; display: block; flex-shrink: 0; }
 
-    /* CHAMPS */
-    label {
-      display: block; font-size: 10px; font-weight: 600;
-      color: #888; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 5px;
-    }
-    .field { margin-bottom: 14px; }
-    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 14px; }
+    /* FORM */
+    label { display: block; font-size: 10px; font-weight: 700; color: #aaa; margin-bottom: 4px; letter-spacing: 0.5px; text-transform: uppercase; }
+    .field { margin-bottom: 10px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px; }
 
     input[type=text], input[type=tel], select {
-      width: 100%; padding: 10px 0; font-size: 14px; color: #111;
-      border: none; border-bottom: 1px solid #ddd;
-      background: transparent; outline: none;
-      transition: border-color 0.15s; font-family: inherit;
-      border-radius: 0;
+      width: 100%; padding: 10px 12px; font-size: 14px; color: #111;
+      border: 1.5px solid #f0f0f0; border-radius: 10px; background: #f8f8f8;
+      outline: none; transition: border-color 0.15s; font-family: inherit;
     }
-    input:focus, select:focus { border-bottom-color: #111; }
-    select:disabled { color: #bbb; }
-    input[type=text][readonly] {
-      color: #bbb; cursor: default; user-select: none;
-    }
-    select { -webkit-appearance: none; appearance: none; cursor: pointer; }
+    input:focus, select:focus { border-color: #ff4747; background: #fff; }
+    select:disabled { color: #bbb; background: #f5f5f5; }
+    input[type=text][readonly] { color: #bbb; cursor: default; }
 
     /* QTY */
-    .qty-wrap { display: flex; align-items: center; gap: 0; border: 1px solid #ddd; display: inline-flex; margin-top: 6px; }
-    .qty-btn {
-      width: 32px; height: 32px; background: #fff; border: none;
-      font-size: 16px; color: #111; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      font-family: inherit;
-    }
-    .qty-btn:hover { background: #f5f5f5; }
-    .qty-val {
-      width: 36px; text-align: center; font-size: 13px;
-      font-weight: 600; color: #111;
-      border-left: 1px solid #ddd; border-right: 1px solid #ddd;
-      line-height: 32px;
-    }
-    .qty-unit { font-size: 11px; color: #aaa; margin-left: 8px; letter-spacing: 0.5px; }
+    .qty-wrap { display: inline-flex; border: 1.5px solid #e0e0e0; border-radius: 8px; overflow: hidden; margin-top: 6px; }
+    .qty-btn { width: 32px; height: 32px; background: #f5f5f5; border: none; font-size: 18px; color: #111; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+    .qty-btn:hover { background: #ffe0e0; color: #ff4747; }
+    .qty-val { width: 36px; text-align: center; font-size: 14px; font-weight: 700; color: #111; border-left: 1.5px solid #e0e0e0; border-right: 1.5px solid #e0e0e0; line-height: 32px; }
+    .qty-unit { font-size: 11px; color: #aaa; margin-left: 8px; align-self: center; }
 
     /* LIVRAISON */
-    .livr-group { display: flex; gap: 8px; margin-top: 8px; }
-    .livr-card {
-      flex: 1; border: 1px solid #ddd; padding: 12px 8px;
-      cursor: pointer; text-align: center;
-      transition: border-color 0.15s; background: #fff;
-    }
-    .livr-card:hover { border-color: #999; }
-    .livr-card.selected { border: 2px solid #111; }
-    .livr-icon { font-size: 18px; margin-bottom: 4px; }
-    .livr-label { font-size: 10px; font-weight: 700; color: #111; letter-spacing: 0.8px; text-transform: uppercase; margin-bottom: 3px; }
-    .livr-price { font-size: 11px; color: #888; }
+    .livr-group { display: flex; gap: 10px; margin-top: 8px; }
+    .livr-card { flex: 1; border: 2px solid #f0f0f0; border-radius: 12px; padding: 12px 8px; cursor: pointer; text-align: center; background: #fff; transition: all 0.15s; }
+    .livr-card:hover { border-color: #ffcdd2; }
+    .livr-card.selected { border-color: #ff4747; background: #fff5f5; }
+    .livr-icon { font-size: 22px; margin-bottom: 4px; }
+    .livr-label { font-size: 11px; font-weight: 700; color: #111; margin-bottom: 3px; }
+    .livr-price { font-size: 12px; color: #ff4747; font-weight: 700; }
 
     /* PROMO */
     .promo-wrap { display: flex; gap: 8px; margin-top: 6px; }
-    .promo-wrap input { flex: 1; text-transform: uppercase; letter-spacing: 1px; font-size: 13px; }
-    .promo-btn {
-      padding: 10px 14px; font-size: 10px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      background: #111; color: #fff; border: none; cursor: pointer;
-      font-family: inherit; white-space: nowrap;
-    }
-    .promo-btn:hover { background: #333; }
-    .promo-ok { font-size: 11px; color: #2e7d32; margin-top: 5px; display: none; font-weight: 600; letter-spacing: 0.5px; }
-    .promo-err { font-size: 11px; color: #e53935; margin-top: 5px; display: none; }
+    .promo-wrap input { flex: 1; text-transform: uppercase; letter-spacing: 1px; }
+    .promo-btn { padding: 10px 16px; font-size: 12px; font-weight: 800; background: #ff4747; color: #fff; border: none; border-radius: 10px; cursor: pointer; white-space: nowrap; font-family: inherit; }
+    .promo-btn:hover { background: #e53935; }
+    .promo-ok { font-size: 12px; color: #2e7d32; margin-top: 5px; display: none; font-weight: 700; }
+    .promo-err { font-size: 12px; color: #e53935; margin-top: 5px; display: none; }
 
     /* RECAP */
-    .recap-wrap { padding: 16px; background: #fafafa; border-top: 1px solid #f0f0f0; border-bottom: 1px solid #f0f0f0; }
-    .recap-row {
-      display: flex; justify-content: space-between;
-      font-size: 12px; padding: 5px 0; color: #888;
-      border-bottom: 1px solid #f5f5f5;
-    }
+    .recap-box { background: #fff5f5; border-radius: 12px; padding: 14px; border: 1.5px solid #ffe0e0; margin-top: 4px; }
+    .recap-row { display: flex; justify-content: space-between; font-size: 13px; color: #888; padding: 4px 0; border-bottom: 1px solid #fff0f0; }
     .recap-row:last-of-type { border-bottom: none; }
-    .recap-row span:last-child { color: #111; font-weight: 500; direction: ltr; unicode-bidi: embed; }
+    .recap-row span:last-child { color: #111; font-weight: 600; direction: ltr; unicode-bidi: embed; }
     .recap-row.remise span:last-child { color: #2e7d32; }
-    .recap-total {
-      display: flex; justify-content: space-between;
-      font-size: 14px; font-weight: 700; color: #111;
-      padding-top: 10px; margin-top: 6px;
-      border-top: 1px solid #ddd;
-    }
-    .recap-total span:last-child { direction: ltr; unicode-bidi: embed; }
-    .recap-tag {
-      font-size: 9px; background: #111; color: #fff;
-      padding: 2px 6px; letter-spacing: 0.5px; text-transform: uppercase;
-      display: inline-block; margin: 0 4px; vertical-align: middle;
-    }
+    .recap-total { display: flex; justify-content: space-between; font-size: 16px; font-weight: 800; padding-top: 10px; margin-top: 6px; border-top: 2px solid #ffcdd2; }
+    .recap-total span:first-child { color: #111; }
+    .recap-total span:last-child { color: #ff4747; direction: ltr; unicode-bidi: embed; }
+    .recap-tag { font-size: 10px; background: #ff4747; color: #fff; padding: 2px 7px; border-radius: 4px; font-weight: 700; display: inline-block; margin: 0 4px; vertical-align: middle; }
 
     /* ERRORS */
-    .err { font-size: 11px; color: #e53935; margin-top: 4px; display: none; letter-spacing: 0.3px; }
-    .req { color: #e53935; }
+    .err { font-size: 11px; color: #e53935; margin-top: 4px; display: none; }
+    .req { color: #ff4747; }
 
-    /* BUTTON SUBMIT */
+    /* BUTTON */
     .btn-submit {
-      width: 100%; padding: 15px; font-size: 11px; font-weight: 700;
-      letter-spacing: 2px; text-transform: uppercase;
-      background: #111; color: #fff; border: none;
-      cursor: pointer; font-family: inherit; transition: background 0.15s;
+      width: 100%; padding: 15px; font-size: 15px; font-weight: 800;
+      background: #ff4747; color: #fff; border: none; border-radius: 12px;
+      cursor: pointer; font-family: inherit; transition: background 0.15s; margin-top: 12px;
+      letter-spacing: 0.3px;
     }
-    .btn-submit:hover { background: #333; }
-    .btn-submit:disabled { background: #ccc; cursor: not-allowed; }
-    .spinner {
-      display: inline-block; width: 12px; height: 12px;
-      border: 2px solid rgba(255,255,255,0.3); border-top-color: #fff;
-      border-radius: 50%; animation: spin 0.7s linear infinite;
-      vertical-align: middle; margin-right: 8px;
-    }
+    .btn-submit:hover { background: #e53935; }
+    .btn-submit:disabled { background: #ffcdd2; cursor: not-allowed; }
+    .spinner { display: inline-block; width: 14px; height: 14px; border: 2px solid rgba(255,255,255,0.4); border-top-color: #fff; border-radius: 50%; animation: spin 0.7s linear infinite; vertical-align: middle; margin-right: 8px; }
 
     /* INIT MSG */
-    .init-msg { text-align: center; padding: 3rem 1rem; font-size: 12px; color: #aaa; letter-spacing: 1px; text-transform: uppercase; }
+    .init-msg { text-align: center; padding: 3rem 1rem; font-size: 13px; color: #aaa; }
 
     /* SUCCESS */
-    .success { text-align: center; padding: 3rem 1.5rem; display: none; background: #fff; }
-    .success-check {
-      width: 48px; height: 48px; border: 2px solid #111;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1.5rem;
-    }
-    .success-check svg { width: 22px; height: 22px; stroke: #111; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
-    .success-title { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 12px; }
+    .success { text-align: center; padding: 3rem 1.5rem; display: none; }
+    .success-icon { width: 56px; height: 56px; border-radius: 50%; background: #e8f5e9; display: flex; align-items: center; justify-content: center; margin: 0 auto 1rem; }
+    .success-icon svg { width: 26px; height: 26px; stroke: #2e7d32; fill: none; stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
+    .success-title { font-size: 16px; font-weight: 800; color: #111; margin-bottom: 8px; }
     .success-sub { font-size: 13px; color: #666; line-height: 1.9; }
 
-    /* DESCRIPTION & CONDITIONS */
-    .info-section { padding: 20px 16px; border-bottom: 1px solid #f0f0f0; }
-    .info-title {
-      font-size: 10px; font-weight: 700; color: #111;
-      letter-spacing: 2px; text-transform: uppercase;
-      margin-bottom: 12px; padding-bottom: 8px;
-      border-bottom: 1px solid #f0f0f0;
-    }
+    /* DESC & CONDITIONS */
+    .info-section { background: #fff; padding: 14px; margin-bottom: 4px; }
+    .info-title { font-size: 13px; font-weight: 700; color: #111; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+    .info-title::before { content: ''; width: 3px; height: 15px; background: #ff4747; border-radius: 2px; display: block; flex-shrink: 0; }
     .desc-text { font-size: 13px; color: #555; line-height: 1.85; white-space: pre-line; }
     .cond-list { list-style: none; }
-    .cond-list li {
-      font-size: 13px; color: #555; padding: 8px 0;
-      border-bottom: 1px solid #f8f8f8;
-      display: flex; align-items: flex-start; gap: 10px; line-height: 1.5;
-    }
+    .cond-list li { font-size: 13px; color: #555; padding: 7px 0; border-bottom: 1px solid #f8f8f8; display: flex; align-items: flex-start; gap: 8px; line-height: 1.5; }
     .cond-list li:last-child { border-bottom: none; }
-    .cond-dot { width: 4px; height: 4px; background: #111; flex-shrink: 0; margin-top: 7px; }
+    .cond-dot { width: 6px; height: 6px; background: #ff4747; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
 
     /* ERROR PAGE */
-    .error-page { display: none; text-align: center; padding: 4rem 1rem; }
-    .error-page h2 { font-size: 13px; letter-spacing: 2px; text-transform: uppercase; color: #111; margin-bottom: 8px; }
-    .error-page p { font-size: 12px; color: #aaa; }
+    .error-page { display: none; text-align: center; padding: 4rem 1rem; background: #fff; }
+    .error-page h2 { font-size: 16px; font-weight: 800; color: #ff4747; margin-bottom: 8px; }
+    .error-page p { font-size: 13px; color: #aaa; }
 
     /* LIGHTBOX */
-    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95); z-index: 999; align-items: center; justify-content: center; }
+    .lightbox { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.94); z-index: 999; align-items: center; justify-content: center; }
     .lightbox.open { display: flex; }
-    .lightbox img { max-width: 95vw; max-height: 90vh; }
-    .lb-close { position: fixed; top: 16px; right: 20px; color: #fff; font-size: 28px; cursor: pointer; font-weight: 300; }
+    .lightbox img { max-width: 95vw; max-height: 90vh; border-radius: 10px; }
+    .lb-close { position: fixed; top: 16px; right: 20px; color: #fff; font-size: 30px; cursor: pointer; }
 
     /* RTL */
     [dir=rtl] { font-family: 'Segoe UI', 'Noto Naskh Arabic', 'Arabic Typesetting', sans-serif; }
-    [dir=rtl] .topbar { flex-direction: row-reverse; }
+    [dir=rtl] .t-header, [dir=rtl] .stars-row, [dir=rtl] .tags-row, [dir=rtl] .price-main { flex-direction: row-reverse; }
     [dir=rtl] .recap-row, [dir=rtl] .recap-total { flex-direction: row-reverse; }
-    [dir=rtl] .cond-list li { flex-direction: row-reverse; }
-    [dir=rtl] .price-row { flex-direction: row-reverse; }
+    [dir=rtl] .cond-list li, [dir=rtl] .card-title, [dir=rtl] .info-title { flex-direction: row-reverse; }
     [dir=rtl] .livr-group { flex-direction: row-reverse; }
+    [dir=rtl] .card-title::before, [dir=rtl] .info-title::before { order: 1; }
+
+    /* BOTTOM PADDING */
+    .page-bottom { height: 20px; background: #f5f5f5; }
 
     @media(max-width: 480px) {
       .row2 { grid-template-columns: 1fr; }
-      .product-img-wrap img { height: 260px; }
+      .product-img img { height: 250px; }
     }
   </style>
 </head>
@@ -289,64 +234,63 @@
   <img id="lbImg" src="" alt=""/>
 </div>
 
-<!-- Countdown -->
-<div class="countdown-wrap" id="countdownWrap" style="display:none">
-  <div class="countdown-inner">
-    <span id="cdLabel">OFFRE EXPIRE DANS</span>
-    <span class="cd-box" id="cdH">00</span>H
-    <span class="cd-box" id="cdM">00</span>M
-    <span class="cd-box" id="cdS">00</span>S
-  </div>
-</div>
+<div id="mainPage" style="display:none; max-width:600px; margin:0 auto;">
 
-<div class="page" id="mainPage" style="display:none">
-
-  <!-- Topbar -->
-  <div class="topbar" id="topbar">
-    <div class="topbar-logo" id="topbarLogo">BOUTIQUE</div>
+  <!-- Header -->
+  <div class="t-header" id="topbar" style="display:none">
+    <div class="t-logo" id="topbarLogo">BOUTIQUE</div>
     <div class="lang-toggle">
       <button class="lang-btn" id="btnFR" onclick="setLang('fr')">FR</button>
-      <span class="lang-sep">|</span>
       <button class="lang-btn" id="btnAR" onclick="setLang('ar')">ع</button>
     </div>
   </div>
 
-  <!-- Image principale -->
-  <div class="product-img-wrap" id="bannerEl">
-    <img id="mainImg" src="" alt="produit" onclick="openLightbox(this.src)"/>
-    <div class="img-badge" id="imgBadge">NOUVEAU</div>
-    <div class="img-badge-promo" id="imgPromo" style="display:none"></div>
-  </div>
-
-  <!-- Miniatures -->
-  <div class="thumbs-row" id="thumbsWrap"></div>
-
-  <!-- Infos produit -->
-  <div class="product-info">
-    <div class="product-ref" id="productRef"></div>
-    <div class="product-name" id="bannerTitle"></div>
-    <div class="product-sub" id="bannerSub"></div>
-    <div class="price-row">
-      <div class="price-current" id="bannerPrice"></div>
-      <div class="price-old" id="bannerOldPrice" style="display:none"></div>
-      <div class="price-save" id="priceSave" style="display:none"></div>
+  <!-- Countdown -->
+  <div class="countdown-wrap" id="countdownWrap">
+    <div class="countdown-inner">
+      <span id="cdLabel">⏰ OFFRE EXPIRE DANS</span>
+      <span class="cd-box" id="cdH">00</span>H
+      <span class="cd-box" id="cdM">00</span>M
+      <span class="cd-box" id="cdS">00</span>S
     </div>
   </div>
 
-  <!-- FORMULAIRE -->
-  <div class="form-section">
-    <div class="form-section-title" id="pageTitle">Confirmer ma commande</div>
+  <!-- Image -->
+  <div class="product-img" id="bannerEl">
+    <img id="mainImg" src="" alt="produit" onclick="openLightbox(this.src)"/>
+    <div class="img-badge-new" id="imgBadge">NOUVEAU</div>
+    <div class="img-badge-pct" id="imgPromo" style="display:none"></div>
+    <div class="img-sold" id="imgSold" style="display:none"></div>
+  </div>
+
+  <!-- Thumbs -->
+  <div class="thumbs-row" id="thumbsWrap"></div>
+
+  <!-- Product info -->
+  <div class="product-info">
+    <div class="price-main">
+      <span id="bannerPrice">— DA</span>
+      <span class="price-old" id="bannerOldPrice" style="display:none"></span>
+      <span class="price-save" id="priceSave" style="display:none"></span>
+    </div>
+    <div class="product-name" id="bannerTitle"></div>
+    <div class="product-sub" id="bannerSub"></div>
+    <div class="stars-row" id="starsRow" style="display:none">
+      <span class="stars">★★★★★</span>
+      <span class="reviews" id="reviewsText"></span>
+    </div>
+    <div class="tags-row" id="tagsRow"></div>
+  </div>
+
+  <!-- Card : Infos client -->
+  <div class="t-card">
+    <div class="card-title" id="fslInfo">Vos informations</div>
     <div id="initMsg" class="init-msg">Chargement...</div>
-
     <div id="formArea" style="display:none">
-
       <div class="field">
         <label id="lCode">Référence produit</label>
         <input type="text" id="codeProduit" readonly tabindex="-1"/>
       </div>
-
-      <div class="form-section-title" id="fslInfo" style="margin-top:16px">Vos informations</div>
-
       <div class="row2">
         <div class="field">
           <label id="lNom">Nom <span class="req">*</span></label>
@@ -359,7 +303,6 @@
           <div class="err" id="errPrenom"></div>
         </div>
       </div>
-
       <div class="row2">
         <div class="field">
           <label id="lTel">Téléphone <span class="req">*</span></label>
@@ -378,93 +321,92 @@
           </div>
         </div>
       </div>
-
-      <div class="form-section-title" id="fslLivr" style="margin-top:16px">Adresse de livraison</div>
-
-      <div class="row2">
-        <div class="field">
-          <label id="lWilaya">Wilaya <span class="req">*</span></label>
-          <select id="wilaya" onchange="onWilaya()"><option value="">—</option></select>
-          <div class="err" id="errWilaya"></div>
-        </div>
-        <div class="field">
-          <label id="lCommune">Commune <span class="req">*</span></label>
-          <select id="commune" disabled><option value="">—</option></select>
-          <div class="err" id="errCommune"></div>
-        </div>
-      </div>
-
-      <div class="field">
-        <label id="lLivraison">Mode de livraison</label>
-        <div class="livr-group">
-          <div class="livr-card" id="opt-domicile" onclick="setLivraison('domicile')">
-            <div class="livr-icon">🏠</div>
-            <div class="livr-label" id="txtDomicile">Domicile</div>
-            <div class="livr-price" id="livPriceDom">— DA</div>
-          </div>
-          <div class="livr-card selected" id="opt-bureau" onclick="setLivraison('bureau')">
-            <div class="livr-icon">🏢</div>
-            <div class="livr-label" id="txtBureau">Bureau</div>
-            <div class="livr-price" id="livPriceBur">— DA</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Code promo -->
-      <div class="field" id="promoSection" style="display:none">
-        <label id="lPromo">Code promo</label>
-        <div class="promo-wrap">
-          <input type="text" id="promoInput" placeholder="CODE PROMO"/>
-          <button class="promo-btn" onclick="appliquerPromo()" id="promoBtn">Appliquer</button>
-        </div>
-        <div class="promo-ok" id="promoOk"></div>
-        <div class="promo-err" id="promoErr"></div>
-      </div>
-
     </div>
-
     <div class="success" id="successArea">
-      <div class="success-check"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
       <p class="success-title" id="successTitle"></p>
       <p class="success-sub" id="successMsg"></p>
     </div>
   </div>
 
-  <!-- RECAP + BOUTON -->
-  <div class="recap-wrap" id="recapWrap">
-    <div class="recap-row"><span id="lPrix">Prix unitaire</span><span id="recapPrix">— DA</span></div>
-    <div class="recap-row"><span id="lSousTotal">Sous-total</span><span id="recapSousTotal">— DA</span></div>
-    <div class="recap-row remise" id="rowRemiseQte" style="display:none"><span id="lRemiseQte">Remise quantité</span><span id="recapRemiseQte"></span></div>
-    <div class="recap-row remise" id="rowRemisePromo" style="display:none"><span id="lRemisePromo">Code promo</span><span id="recapRemisePromo"></span></div>
-    <div class="recap-row remise" id="rowRemiseWilaya" style="display:none"><span id="lRemiseWilaya">Remise wilaya</span><span id="recapRemiseWilaya"></span></div>
-    <div class="recap-row">
-      <span id="lFraisWrap">Livraison <span class="recap-tag" id="recapTag">bureau</span></span>
-      <span id="recapFrais">— DA</span>
+  <!-- Card : Livraison -->
+  <div class="t-card" id="livrCard">
+    <div class="card-title" id="fslLivr">Adresse de livraison</div>
+    <div class="row2">
+      <div class="field">
+        <label id="lWilaya">Wilaya <span class="req">*</span></label>
+        <select id="wilaya" onchange="onWilaya()"><option value="">—</option></select>
+        <div class="err" id="errWilaya"></div>
+      </div>
+      <div class="field">
+        <label id="lCommune">Commune <span class="req">*</span></label>
+        <select id="commune" disabled><option value="">—</option></select>
+        <div class="err" id="errCommune"></div>
+      </div>
     </div>
-    <div class="recap-total"><span id="lTotal">Total</span><span id="recapTotal">— DA</span></div>
+    <div class="field">
+      <label id="lLivraison">Mode de livraison</label>
+      <div class="livr-group">
+        <div class="livr-card" id="opt-domicile" onclick="setLivraison('domicile')">
+          <div class="livr-icon">🏠</div>
+          <div class="livr-label" id="txtDomicile">Domicile</div>
+          <div class="livr-price" id="livPriceDom">— DA</div>
+        </div>
+        <div class="livr-card selected" id="opt-bureau" onclick="setLivraison('bureau')">
+          <div class="livr-icon">🏢</div>
+          <div class="livr-label" id="txtBureau">Bureau</div>
+          <div class="livr-price" id="livPriceBur">— DA</div>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <div style="padding:0">
-    <div class="err" id="errGlobal" style="margin:8px 16px;display:none"></div>
-    <button class="btn-submit" id="btnSubmit" onclick="submit()">Confirmer ma commande</button>
+  <!-- Card : Code promo -->
+  <div class="t-card" id="promoSection" style="display:none">
+    <div class="card-title" id="lPromoTitle">Code promo</div>
+    <div class="promo-wrap">
+      <input type="text" id="promoInput" placeholder="Ex: PROMO10"/>
+      <button class="promo-btn" onclick="appliquerPromo()" id="promoBtn">Appliquer</button>
+    </div>
+    <div class="promo-ok" id="promoOk"></div>
+    <div class="promo-err" id="promoErr"></div>
   </div>
 
-  <!-- DESCRIPTION -->
+  <!-- Card : Récap + Bouton -->
+  <div class="t-card">
+    <div class="recap-box" id="recapBox">
+      <div class="recap-row"><span id="lPrix">Prix unitaire</span><span id="recapPrix">— DA</span></div>
+      <div class="recap-row"><span id="lSousTotal">Sous-total</span><span id="recapSousTotal">— DA</span></div>
+      <div class="recap-row remise" id="rowRemiseQte" style="display:none"><span id="lRemiseQte">Remise quantité</span><span id="recapRemiseQte"></span></div>
+      <div class="recap-row remise" id="rowRemisePromo" style="display:none"><span id="lRemisePromo">Code promo</span><span id="recapRemisePromo"></span></div>
+      <div class="recap-row remise" id="rowRemiseWilaya" style="display:none"><span id="lRemiseWilaya">Remise wilaya</span><span id="recapRemiseWilaya"></span></div>
+      <div class="recap-row">
+        <span id="lFraisWrap">Livraison <span class="recap-tag" id="recapTag">bureau</span></span>
+        <span id="recapFrais">— DA</span>
+      </div>
+      <div class="recap-total"><span id="lTotal">Total à payer</span><span id="recapTotal">— DA</span></div>
+    </div>
+    <div class="err" id="errGlobal" style="margin-top:8px"></div>
+    <button class="btn-submit" id="btnSubmit" onclick="submit()">🛒 CONFIRMER MA COMMANDE</button>
+  </div>
+
+  <!-- Description -->
   <div class="info-section" id="descSection">
     <div class="info-title" id="lDesc">Description</div>
     <p class="desc-text" id="descText"></p>
   </div>
 
-  <!-- CONDITIONS -->
+  <!-- Conditions -->
   <div class="info-section" id="condSection">
     <div class="info-title" id="lCond">Conditions de commande</div>
     <ul class="cond-list" id="condList"></ul>
   </div>
 
+  <div class="page-bottom"></div>
 </div>
 
 <!-- Error page -->
-<div class="error-page" id="errorPage">
+<div class="error-page" id="errorPage" style="max-width:600px;margin:0 auto">
   <h2>Produit introuvable</h2>
   <p>Vérifiez le lien ou contactez le vendeur.</p>
 </div>
@@ -487,20 +429,21 @@ const UI={
     nom:'Nom', prenom:'Prénom', tel:'Téléphone', wilaya:'Wilaya', commune:'Commune',
     livraison:'Mode de livraison', domicile:'Domicile', bureau:'Bureau',
     prix:'Prix unitaire', sousTotal:'Sous-total', frais:'Livraison',
-    total:'Total', btn:'CONFIRMER MA COMMANDE', codeProduit:'Référence',
-    qte:'Quantité', qteUnit:'article', fraisGratuit:'Offerte',
+    total:'Total à payer', btn:'🛒 CONFIRMER MA COMMANDE', codeProduit:'Référence',
+    qte:'Quantité', qteUnit:'article', fraisGratuit:'🎁 Offerte',
     select:'— Sélectionner —', selectW:'— Sélectionner wilaya —',
-    successTitle:'COMMANDE CONFIRMÉE',
-    errReq:'Champ obligatoire', errTel:'Numéro invalide',
+    successTitle:'🎉 COMMANDE CONFIRMÉE !',
+    errReq:'Champ obligatoire', errTel:'Numéro invalide (ex: 05xxxxxxxx)',
     errGlobal:'Veuillez remplir tous les champs obligatoires.',
-    sending:'ENVOI EN COURS...', errSend:"Erreur. Réessayez.",
-    promo:'Code promo', promoBtn:'APPLIQUER',
-    promoOk:'Code appliqué', promoErrInvalid:'Code invalide.',
+    sending:'ENVOI EN COURS...', errSend:'Erreur. Réessayez.',
+    promo:'Code promo', promoTitle:'Code promo', promoBtn:'APPLIQUER',
+    promoOk:'✅ Code appliqué !', promoErrInvalid:'Code invalide.',
     promoErrUsed:'Code déjà utilisé.', promoErrExpired:'Code expiré.',
     remiseQte:'Remise quantité', remisePromo:'Code promo',
-    remiseWilaya:'Remise wilaya', cdLabel:'OFFRE EXPIRE DANS',
-    fslInfo:'VOS INFORMATIONS', fslLivr:'ADRESSE DE LIVRAISON',
-    imgBadge:'NOUVEAU',
+    remiseWilaya:'Remise wilaya', cdLabel:'⏰ OFFRE EXPIRE DANS',
+    fslInfo:'Vos informations', fslLivr:'Adresse de livraison',
+    imgBadge:'NOUVEAU', soldText:'🔥 {n} vendus',
+    tagStock:'🔥 Stock limité', tagLivr:'⚡ Livraison rapide', tagPay:'✓ Paiement à la livraison',
     ph_nom:'Benali', ph_prenom:'Ahmed', ph_tel:'05 XX XX XX XX'
   },
   ar:{
@@ -509,20 +452,21 @@ const UI={
     nom:'اللقب', prenom:'الاسم', tel:'رقم الهاتف', wilaya:'الولاية', commune:'البلدية',
     livraison:'نوع التوصيل', domicile:'للمنزل', bureau:'للمكتب',
     prix:'سعر الوحدة', sousTotal:'المجموع الجزئي', frais:'التوصيل',
-    total:'الإجمالي', btn:'تأكيد الطلب', codeProduit:'المرجع',
-    qte:'الكمية', qteUnit:'قطعة', fraisGratuit:'مجاني',
+    total:'المبلغ الإجمالي', btn:'🛒 تأكيد الطلب', codeProduit:'المرجع',
+    qte:'الكمية', qteUnit:'قطعة', fraisGratuit:'🎁 مجاني',
     select:'— اختر —', selectW:'— اختر الولاية —',
-    successTitle:'تم تأكيد الطلب',
+    successTitle:'🎉 تم تأكيد الطلب !',
     errReq:'حقل إلزامي', errTel:'رقم غير صحيح',
     errGlobal:'يرجى ملء جميع الحقول الإلزامية.',
     sending:'جاري الإرسال...', errSend:'خطأ. حاول مجدداً.',
-    promo:'كود الخصم', promoBtn:'تطبيق',
-    promoOk:'تم تطبيق الكود', promoErrInvalid:'كود غير صالح.',
+    promo:'كود الخصم', promoTitle:'كود الخصم', promoBtn:'تطبيق',
+    promoOk:'✅ تم تطبيق الكود !', promoErrInvalid:'كود غير صالح.',
     promoErrUsed:'تم استخدام الكود.', promoErrExpired:'الكود منتهي.',
     remiseQte:'خصم الكمية', remisePromo:'خصم الترويج',
-    remiseWilaya:'خصم الولاية', cdLabel:'العرض ينتهي خلال',
+    remiseWilaya:'خصم الولاية', cdLabel:'⏰ العرض ينتهي خلال',
     fslInfo:'بياناتكم', fslLivr:'عنوان التوصيل',
-    imgBadge:'جديد',
+    imgBadge:'جديد', soldText:'🔥 {n} مبيعاً',
+    tagStock:'🔥 كمية محدودة', tagLivr:'⚡ توصيل سريع', tagPay:'✓ الدفع عند الاستلام',
     ph_nom:'بن علي', ph_prenom:'أحمد', ph_tel:'05 XX XX XX XX'
   }
 };
@@ -576,17 +520,36 @@ function buildProduit(){
   $('bannerTitle').textContent=nom;
   $('bannerSub').textContent=sub||'';
   $('bannerPrice').textContent=fmt(produit.prix);
-  $('productRef').textContent='RÉF. '+produit.code;
   $('imgBadge').textContent=u.imgBadge;
   if(produit.prix_barre&&produit.prix_barre>produit.prix){
     $('bannerOldPrice').textContent=fmt(produit.prix_barre);
-    $('bannerOldPrice').style.display='block';
+    $('bannerOldPrice').style.display='inline';
     const save=produit.prix_barre-produit.prix;
     $('priceSave').textContent='−'+fmt(save);
-    $('priceSave').style.display='block';
-    $('imgPromo').textContent='−'+Math.round(save/produit.prix_barre*100)+'%';
+    $('priceSave').style.display='inline';
+    const pct=Math.round(save/produit.prix_barre*100);
+    $('imgPromo').textContent='−'+pct+'%';
     $('imgPromo').style.display='block';
   }
+  // Avis et tags
+  if(produit.avis_count){
+    $('starsRow').style.display='flex';
+    $('reviewsText').textContent=`${produit.avis_note||4.9} (${produit.avis_count} avis)`;
+  }
+  if(produit.vendus_count){
+    $('imgSold').textContent=u.soldText.replace('{n}',produit.vendus_count);
+    $('imgSold').style.display='block';
+  }
+  // Tags
+  const tr=$('tagsRow'); tr.innerHTML='';
+  const tags=[{cls:'tag-red',txt:u.tagStock},{cls:'tag-orange',txt:u.tagLivr},{cls:'tag-green',txt:u.tagPay}];
+  tags.forEach(t=>{const s=document.createElement('span');s.className='tag '+t.cls;s.textContent=t.txt;tr.appendChild(s);});
+  // Badges bannière
+  (produit.badges||[]).forEach(b=>{
+    const s=document.createElement('span');
+    s.className='tag '+(b.accent?'tag-red':'tag-orange');
+    s.textContent=b.texte; tr.appendChild(s);
+  });
   $('descText').textContent=desc||'';
   const ul=$('condList'); ul.innerHTML='';
   (conds||[]).forEach(c=>{
@@ -605,12 +568,9 @@ function setLang(l){
   $('btnFR').classList.toggle('active',l==='fr');
   $('btnAR').classList.toggle('active',l==='ar');
   const u=UI[l];
-  $('pageTitle').textContent  =u.pageTitle;
-  $('lDesc').textContent      =u.lDesc;
-  $('lCond').textContent      =u.lCond;
-  $('lCode').textContent      =u.codeProduit;
   $('fslInfo').textContent    =u.fslInfo;
   $('fslLivr').textContent    =u.fslLivr;
+  $('lCode').textContent      =u.codeProduit;
   $('lNom').innerHTML         =u.nom+' <span class="req">*</span>';
   $('lPrenom').innerHTML      =u.prenom+' <span class="req">*</span>';
   $('lTel').innerHTML         =u.tel+' <span class="req">*</span>';
@@ -625,12 +585,14 @@ function setLang(l){
   $('btnSubmit').textContent  =u.btn;
   $('lQte').textContent       =u.qte;
   $('qtyUnit').textContent    =u.qteUnit;
-  $('lPromo').textContent     =u.promo;
+  $('lPromoTitle').textContent=u.promoTitle;
   $('promoBtn').textContent   =u.promoBtn;
   $('lRemiseQte').textContent =u.remiseQte;
   $('lRemisePromo').textContent=u.remisePromo;
   $('lRemiseWilaya').textContent=u.remiseWilaya;
   $('cdLabel').textContent    =u.cdLabel;
+  $('lDesc').textContent      =u.lDesc;
+  $('lCond').textContent      =u.lCond;
   $('nom').placeholder        =u.ph_nom;
   $('prenom').placeholder     =u.ph_prenom;
   $('tel').placeholder        =u.ph_tel;
@@ -740,7 +702,6 @@ function updateRecap(){
     $('recapFrais').textContent=frais!==null?fmt(frais):'— DA';
     $('recapTotal').textContent=total!==null?fmt(total):'— DA';
   }
-  // Prix livraison dans les cartes
   if(wId&&!produit.livraison_gratuite){
     const td=(tarifs[produit.transporteur||'zr']||{}).domicile||{};
     const tb=(tarifs[produit.transporteur||'zr']||{}).bureau||{};
@@ -789,11 +750,11 @@ async function submit(){
   const wText=wSel.options[wSel.selectedIndex]?.text||'';
   const commune=$('commune').value,u=UI[lang];
   let ok=true;
-  showErr('errNom',!nom);     if(!nom)    ok=false;
+  showErr('errNom',!nom);      if(!nom)    ok=false;
   showErr('errPrenom',!prenom);if(!prenom) ok=false;
   const telOk=/^0[5-7]\d{8}$/.test(tel);
-  showErr('errTel',!telOk);   if(!telOk)  ok=false;
-  showErr('errWilaya',!wId);  if(!wId)    ok=false;
+  showErr('errTel',!telOk);    if(!telOk)  ok=false;
+  showErr('errWilaya',!wId);   if(!wId)    ok=false;
   showErr('errCommune',!commune);if(!commune) ok=false;
   showErr('errGlobal',!ok);
   if(!ok) return;
@@ -816,12 +777,14 @@ async function submit(){
   try{
     await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     $('formArea').style.display='none';
-    $('recapWrap').style.display='none';
-    document.querySelector('.btn-submit').style.display='none';
+    $('livrCard').style.display='none';
+    $('promoSection').style.display='none';
+    $('recapBox').style.display='none';
+    btn.style.display='none';
     $('successArea').style.display='block';
     $('successTitle').textContent=u.successTitle;
     const fl=produit.livraison_gratuite?u.fraisGratuit:fmt(frais);
-    $('successMsg').innerHTML=`<strong>${prenom} ${nom}</strong><br>${tel}<br>${commune} — ${wText}<br>${u.qte} : <strong>${quantite}</strong><br>${u.livraison} : <strong>${livraison==='domicile'?u.domicile:u.bureau}</strong><br>${u.frais} : ${fl}<br><br><strong>${u.total} : ${fmt(total)}</strong>`;
+    $('successMsg').innerHTML=`<strong>${prenom} ${nom}</strong><br>${tel}<br>${commune} — ${wText}<br>${u.qte} : <strong>${quantite}</strong><br>${u.livraison} : <strong>${livraison==='domicile'?u.domicile:u.bureau}</strong><br>${u.frais} : ${fl}<br><br><strong style="color:#ff4747;font-size:16px">${u.total} : ${fmt(total)}</strong>`;
   }catch(e){alert(u.errSend);btn.disabled=false;btn.textContent=u.btn;}
 }
 
