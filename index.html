@@ -211,8 +211,54 @@
     [dir=rtl] .livr-group { flex-direction: row-reverse; }
     [dir=rtl] .card-title::before, [dir=rtl] .info-title::before { order: 1; }
 
-    /* BOTTOM PADDING */
-    .page-bottom { height: 20px; background: #f5f5f5; }
+    /* ===== LAYOUT 2 COLONNES PC ===== */
+    @media(min-width: 900px) {
+      body { background: #e8e8e8; }
+      .t-header { width: 100%; }
+      .countdown-wrap { width: 100%; }
+
+      .pc-layout {
+        display: grid;
+        grid-template-columns: 1fr 460px;
+        gap: 0;
+        max-width: 1280px;
+        margin: 0 auto;
+        align-items: start;
+        background: #f5f5f5;
+        box-shadow: 0 0 40px rgba(0,0,0,0.1);
+      }
+
+      .pc-col-left {
+        position: sticky;
+        top: 54px;
+        background: #fff;
+        border-right: 1px solid #eee;
+        max-height: calc(100vh - 54px);
+        overflow-y: auto;
+      }
+      .product-img img { height: 400px; }
+
+      .pc-col-right {
+        background: #f5f5f5;
+        max-height: calc(100vh - 54px);
+        overflow-y: auto;
+      }
+      .pc-col-right .t-card { border-radius: 0; margin-bottom: 0; border-top: 4px solid #f5f5f5; }
+
+      /* Sur PC : masquer les sections mobile */
+      .desc-mobile, .cond-mobile { display: none !important; }
+    }
+
+    /* Sur mobile : masquer les sections PC (col gauche desc/cond) */
+    @media(max-width: 899px) {
+      #descSection, #condSection { display: none !important; }
+      .desc-mobile, .cond-mobile { display: block; }
+      .pc-layout { display: block; }
+    }
+
+    /* RTL */
+    [dir=rtl] .pc-layout { direction: rtl; }
+    [dir=rtl] .pc-col-left { border-right: none; border-left: 1px solid #eee; }
 
     @media(max-width: 480px) {
       .row2 { grid-template-columns: 1fr; }
@@ -234,7 +280,7 @@
   <img id="lbImg" src="" alt=""/>
 </div>
 
-<div id="mainPage" style="display:none; max-width:600px; margin:0 auto;">
+<div id="mainPage" style="display:none;">
 
   <!-- Header -->
   <div class="t-header" id="topbar" style="display:none">
@@ -255,6 +301,8 @@
     </div>
   </div>
 
+  <div class="pc-layout">
+  <div class="pc-col-left">
   <!-- Image -->
   <div class="product-img" id="bannerEl">
     <img id="mainImg" src="" alt="produit" onclick="openLightbox(this.src)"/>
@@ -282,6 +330,20 @@
     <div class="tags-row" id="tagsRow"></div>
   </div>
 
+  <!-- Description (PC col gauche) -->
+  <div class="info-section" id="descSection">
+    <div class="info-title" id="lDesc">Description</div>
+    <p class="desc-text" id="descText"></p>
+  </div>
+
+  <!-- Conditions (PC col gauche) -->
+  <div class="info-section" id="condSection">
+    <div class="info-title" id="lCond">Conditions de commande</div>
+    <ul class="cond-list" id="condList"></ul>
+  </div>
+
+  </div><!-- fin pc-col-left -->
+  <div class="pc-col-right">
   <!-- Card : Infos client -->
   <div class="t-card">
     <div class="card-title" id="fslInfo">Vos informations</div>
@@ -390,23 +452,25 @@
     <button class="btn-submit" id="btnSubmit" onclick="submit()">🛒 CONFIRMER MA COMMANDE</button>
   </div>
 
-  <!-- Description -->
-  <div class="info-section" id="descSection">
-    <div class="info-title" id="lDesc">Description</div>
-    <p class="desc-text" id="descText"></p>
+  <!-- Description (mobile : sous formulaire) -->
+  <div class="info-section desc-mobile" id="descSectionMobile">
+    <div class="info-title">Description</div>
+    <p class="desc-text" id="descTextMobile"></p>
   </div>
 
-  <!-- Conditions -->
-  <div class="info-section" id="condSection">
-    <div class="info-title" id="lCond">Conditions de commande</div>
-    <ul class="cond-list" id="condList"></ul>
+  <!-- Conditions (mobile : sous formulaire) -->
+  <div class="info-section cond-mobile" id="condSectionMobile">
+    <div class="info-title">Conditions de commande</div>
+    <ul class="cond-list" id="condListMobile"></ul>
   </div>
 
   <div class="page-bottom"></div>
+  </div><!-- fin pc-col-right -->
+  </div><!-- fin pc-layout -->
 </div>
 
 <!-- Error page -->
-<div class="error-page" id="errorPage" style="max-width:600px;margin:0 auto">
+<div class="error-page" id="errorPage">
   <h2>Produit introuvable</h2>
   <p>Vérifiez le lien ou contactez le vendeur.</p>
 </div>
@@ -551,11 +615,17 @@ function buildProduit(){
     s.textContent=b.texte; tr.appendChild(s);
   });
   $('descText').textContent=desc||'';
+  // Mobile : sections dupliquées
+  const dtm=$('descTextMobile'); if(dtm) dtm.textContent=desc||'';
   const ul=$('condList'); ul.innerHTML='';
+  const ulm=$('condListMobile'); if(ulm) ulm.innerHTML='';
   (conds||[]).forEach(c=>{
-    const li=document.createElement('li');
-    li.innerHTML=`<span class="cond-dot"></span><span>${c}</span>`;
-    ul.appendChild(li);
+    ['condList','condListMobile'].forEach(id=>{
+      const el=$( id); if(!el) return;
+      const li=document.createElement('li');
+      li.innerHTML=`<span class="cond-dot"></span><span>${c}</span>`;
+      el.appendChild(li);
+    });
   });
 }
 
