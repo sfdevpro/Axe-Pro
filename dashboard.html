@@ -1,0 +1,566 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Dashboard Admin</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    body{font-family:'Segoe UI',Tahoma,sans-serif;background:#f4f5f7;color:#111;min-height:100vh}
+
+    /* SIDEBAR */
+    .sidebar{position:fixed;left:0;top:0;bottom:0;width:220px;background:#111;padding:1.5rem 0;z-index:100}
+    .logo{padding:0 20px 1.5rem;font-size:16px;font-weight:700;color:#fff;border-bottom:1px solid #333;margin-bottom:1rem}
+    .logo span{color:#4ade80}
+    .nav-item{display:flex;align-items:center;gap:10px;padding:10px 20px;font-size:13px;color:#aaa;cursor:pointer;transition:background 0.15s}
+    .nav-item:hover{background:#222;color:#fff}
+    .nav-item.active{background:#222;color:#fff;border-left:3px solid #4ade80}
+    .nav-icon{font-size:16px;width:20px;text-align:center}
+
+    /* MAIN */
+    .main{margin-left:220px;padding:1.5rem}
+    .page-title{font-size:20px;font-weight:700;margin-bottom:1.5rem;display:flex;align-items:center;gap:10px}
+
+    /* TAB CONTENT */
+    .tab-content{display:none}
+    .tab-content.active{display:block}
+
+    /* STATS CARDS */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:1.5rem}
+    .stat-card{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06)}
+    .stat-val{font-size:26px;font-weight:700;color:#111;margin-bottom:4px}
+    .stat-label{font-size:12px;color:#888}
+    .stat-card.green .stat-val{color:#16a34a}
+    .stat-card.blue  .stat-val{color:#1a56db}
+    .stat-card.orange .stat-val{color:#ea580c}
+
+    /* CHART */
+    .chart-wrap{background:#fff;border-radius:12px;padding:16px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:1.5rem}
+    .chart-title{font-size:14px;font-weight:600;margin-bottom:14px;color:#555}
+    .bar-chart{display:flex;align-items:flex-end;gap:6px;height:120px}
+    .bar-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
+    .bar{width:100%;background:#1a56db;border-radius:4px 4px 0 0;transition:height 0.5s;min-height:2px}
+    .bar-label{font-size:9px;color:#999;writing-mode:vertical-lr;transform:rotate(180deg);white-space:nowrap}
+    .bar-val{font-size:9px;color:#555;font-weight:600}
+
+    /* TABLE */
+    .table-wrap{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,0.06);overflow:hidden;margin-bottom:1.5rem}
+    .table-header{padding:14px 16px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #f0f0f0}
+    .table-title{font-size:14px;font-weight:600;color:#555}
+    table{width:100%;border-collapse:collapse}
+    th{font-size:11px;font-weight:600;color:#888;text-transform:uppercase;padding:10px 16px;text-align:left;background:#fafafa;border-bottom:1px solid #f0f0f0}
+    td{font-size:13px;padding:10px 16px;border-bottom:1px solid #f5f5f5;vertical-align:middle}
+    tr:last-child td{border-bottom:none}
+    tr:hover td{background:#fafafa}
+
+    /* BADGES */
+    .badge{display:inline-block;font-size:11px;padding:3px 8px;border-radius:20px;font-weight:500}
+    .badge.green{background:#dcfce7;color:#16a34a}
+    .badge.orange{background:#ffedd5;color:#ea580c}
+    .badge.red{background:#fee2e2;color:#dc2626}
+    .badge.blue{background:#dbeafe;color:#1a56db}
+    .badge.gray{background:#f3f4f6;color:#6b7280}
+
+    /* FORMS */
+    .form-card{background:#fff;border-radius:12px;padding:20px;box-shadow:0 1px 4px rgba(0,0,0,0.06);margin-bottom:1.5rem}
+    .form-title{font-size:14px;font-weight:600;color:#555;margin-bottom:14px;padding-bottom:8px;border-bottom:1px solid #f0f0f0}
+    .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+    .form-grid.c3{grid-template-columns:1fr 1fr 1fr}
+    .form-field{margin-bottom:12px}
+    .form-label{display:block;font-size:12px;color:#666;font-weight:500;margin-bottom:4px}
+    input[type=text],input[type=number],input[type=date],select,textarea{
+      width:100%;padding:8px 11px;font-size:13px;color:#111;
+      border:1px solid #ddd;border-radius:8px;background:#fff;
+      outline:none;transition:border-color 0.15s;font-family:inherit;
+    }
+    input:focus,select:focus,textarea:focus{border-color:#111}
+    textarea{height:70px;resize:vertical}
+    .toggle-field{display:flex;align-items:center;gap:10px}
+    .toggle{width:40px;height:22px;border-radius:11px;background:#ccc;position:relative;cursor:pointer;transition:background 0.2s}
+    .toggle.on{background:#16a34a}
+    .toggle::after{content:'';position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left 0.2s}
+    .toggle.on::after{left:21px}
+
+    /* BUTTONS */
+    .btn{padding:8px 16px;font-size:13px;font-weight:600;border:none;border-radius:8px;cursor:pointer;font-family:inherit;transition:opacity 0.15s}
+    .btn:hover{opacity:0.85}
+    .btn-primary{background:#111;color:#fff}
+    .btn-success{background:#16a34a;color:#fff}
+    .btn-danger{background:#dc2626;color:#fff;padding:5px 10px;font-size:12px}
+    .btn-sm{padding:5px 10px;font-size:12px}
+    .btn-outline{background:transparent;border:1px solid #ddd;color:#555}
+
+    /* ALERTS */
+    .alert{padding:10px 14px;border-radius:8px;font-size:13px;margin-bottom:12px;display:none}
+    .alert.success{background:#dcfce7;color:#16a34a}
+    .alert.error{background:#fee2e2;color:#dc2626}
+
+    /* LOADING */
+    .loading{text-align:center;padding:2rem;color:#888;font-size:14px}
+    .spinner-sm{display:inline-block;width:14px;height:14px;border:2px solid #ddd;border-top-color:#111;border-radius:50%;animation:spin 0.7s linear infinite;vertical-align:middle;margin-right:6px}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    /* TOP LISTS */
+    .top-list{list-style:none}
+    .top-item{display:flex;align-items:center;justify-content:space-between;padding:7px 0;border-bottom:1px solid #f5f5f5;font-size:13px}
+    .top-item:last-child{border-bottom:none}
+    .top-bar-wrap{width:100px;height:6px;background:#f0f0f0;border-radius:3px;margin:0 10px}
+    .top-bar{height:100%;background:#1a56db;border-radius:3px}
+
+    /* RESPONSIVE */
+    @media(max-width:768px){
+      .sidebar{display:none}
+      .main{margin-left:0}
+      .stats-grid{grid-template-columns:1fr 1fr}
+      .form-grid{grid-template-columns:1fr}
+    }
+  </style>
+</head>
+<body>
+
+<div class="sidebar">
+  <div class="logo">🛒 Admin <span>Panel</span></div>
+  <div class="nav-item active" onclick="showTab('stats')">
+    <span class="nav-icon">📊</span> Statistiques
+  </div>
+  <div class="nav-item" onclick="showTab('commandes')">
+    <span class="nav-icon">📦</span> Commandes
+  </div>
+  <div class="nav-item" onclick="showTab('produits')">
+    <span class="nav-icon">🏷️</span> Produits
+  </div>
+  <div class="nav-item" onclick="showTab('remises')">
+    <span class="nav-icon">🎁</span> Remises
+  </div>
+  <div class="nav-item" onclick="showTab('promos')">
+    <span class="nav-icon">🎟️</span> Codes Promo
+  </div>
+  <div class="nav-item" onclick="showTab('config')">
+    <span class="nav-icon">⚙️</span> Configuration
+  </div>
+</div>
+
+<div class="main">
+
+  <!-- ===== STATS ===== -->
+  <div class="tab-content active" id="tab-stats">
+    <div class="page-title">📊 Tableau de bord</div>
+    <div class="stats-grid" id="statsCards">
+      <div class="stat-card"><div class="spinner-sm"></div><div class="stat-label">Chargement...</div></div>
+    </div>
+    <div style="display:grid;grid-template-columns:2fr 1fr;gap:12px">
+      <div class="chart-wrap">
+        <div class="chart-title">Commandes — 14 derniers jours</div>
+        <div class="bar-chart" id="barChart"><div class="loading">Chargement...</div></div>
+      </div>
+      <div class="chart-wrap">
+        <div class="chart-title">Top Wilayas</div>
+        <ul class="top-list" id="topWilayas"><li class="loading">Chargement...</li></ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== COMMANDES ===== -->
+  <div class="tab-content" id="tab-commandes">
+    <div class="page-title">📦 Commandes
+      <button class="btn btn-outline btn-sm" onclick="loadCommandes()">🔄 Actualiser</button>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header">
+        <span class="table-title" id="commandesCount">Chargement...</span>
+        <input type="text" placeholder="Rechercher..." style="width:200px;padding:6px 10px;font-size:12px" oninput="filterCommandes(this.value)"/>
+      </div>
+      <div style="overflow-x:auto">
+        <table>
+          <thead><tr>
+            <th>N° Commande</th><th>Date</th><th>Produit</th>
+            <th>Client</th><th>Téléphone</th><th>Wilaya</th>
+            <th>Qté</th><th>Livraison</th><th>Total</th><th>Statut</th>
+          </tr></thead>
+          <tbody id="commandesBody"><tr><td colspan="10" class="loading">Chargement...</td></tr></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== PRODUITS ===== -->
+  <div class="tab-content" id="tab-produits">
+    <div class="page-title">🏷️ Produits</div>
+    <div class="form-card">
+      <div class="form-title">Ajouter / Modifier un produit</div>
+      <div class="alert" id="alertProduit"></div>
+      <div class="form-grid">
+        <div><label class="form-label">Code produit *</label><input type="text" id="p_code" placeholder="PRD-00002"/></div>
+        <div><label class="form-label">Prix (DA) *</label><input type="number" id="p_prix" placeholder="3500"/></div>
+      </div>
+      <div class="form-grid">
+        <div><label class="form-label">Nom FR *</label><input type="text" id="p_nom_fr" placeholder="Pack Trio Inox"/></div>
+        <div><label class="form-label">Nom AR</label><input type="text" id="p_nom_ar" placeholder="Pack Trio Inox"/></div>
+      </div>
+      <div class="form-grid">
+        <div><label class="form-label">Sous-titre FR</label><input type="text" id="p_sub_fr" placeholder="Accroche..."/></div>
+        <div><label class="form-label">Sous-titre AR</label><input type="text" id="p_sub_ar" placeholder="..."/></div>
+      </div>
+      <div class="form-grid">
+        <div><label class="form-label">Description FR</label><textarea id="p_desc_fr" placeholder="Description..."></textarea></div>
+        <div><label class="form-label">Description AR</label><textarea id="p_desc_ar" placeholder="وصف..."></textarea></div>
+      </div>
+      <div class="form-grid">
+        <div><label class="form-label">Conditions FR (1 par ligne)</label><textarea id="p_conds_fr" placeholder="Livraison 3-5 jours.&#10;Paiement à la livraison."></textarea></div>
+        <div><label class="form-label">Conditions AR (1 par ligne)</label><textarea id="p_conds_ar" placeholder="التوصيل 3-5 أيام."></textarea></div>
+      </div>
+      <div class="form-grid c3">
+        <div><label class="form-label">Transporteur</label>
+          <select id="p_transporteur"><option value="zr">ZR Express</option><option value="yalidine">Yalidine</option><option value="maystro">Maystro</option></select>
+        </div>
+        <div><label class="form-label">Thème</label>
+          <select id="p_theme"><option value="classic">Classique</option><option value="green">Vert</option><option value="bordeaux">Bordeaux</option><option value="blue">Bleu</option></select>
+        </div>
+        <div><label class="form-label">Langue défaut</label>
+          <select id="p_langue"><option value="fr">Français</option><option value="ar">العربية</option></select>
+        </div>
+      </div>
+      <div class="form-grid c3">
+        <div><label class="form-label">Images (1 par ligne)</label><textarea id="p_images" placeholder="images/photo1.jpg&#10;images/photo2.jpg"></textarea></div>
+        <div><label class="form-label">Prix barré (DA)</label><input type="number" id="p_prix_barre" placeholder="0"/></div>
+        <div><label class="form-label">Flash sale fin</label><input type="date" id="p_flash"/></div>
+      </div>
+      <div style="display:flex;gap:16px;align-items:center;margin-top:4px">
+        <div class="toggle-field"><div class="toggle" id="tgl_actif" onclick="toggleField('actif')"></div><label class="form-label" style="margin:0">Actif</label></div>
+        <div class="toggle-field"><div class="toggle" id="tgl_liv_gratuite" onclick="toggleField('liv_gratuite')"></div><label class="form-label" style="margin:0">Livraison gratuite</label></div>
+        <div class="toggle-field"><div class="toggle" id="tgl_promo_active" onclick="toggleField('promo_active')"></div><label class="form-label" style="margin:0">Promos actives</label></div>
+      </div>
+      <div style="margin-top:14px;display:flex;gap:8px">
+        <button class="btn btn-primary" onclick="saveProduit()">💾 Enregistrer</button>
+        <button class="btn btn-outline" onclick="copyLink()">🔗 Copier le lien</button>
+        <button class="btn btn-outline" onclick="resetProduit()">✕ Réinitialiser</button>
+      </div>
+    </div>
+
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Produits enregistrés</span></div>
+      <table>
+        <thead><tr><th>Code</th><th>Nom</th><th>Prix</th><th>Transporteur</th><th>Thème</th><th>Statut</th><th>Lien</th></tr></thead>
+        <tbody id="produitsBody"><tr><td colspan="7" class="loading">Chargement depuis Google Sheets...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== REMISES ===== -->
+  <div class="tab-content" id="tab-remises">
+    <div class="page-title">🎁 Remises</div>
+    <div class="form-card">
+      <div class="form-title">Nouvelle remise quantité / wilaya</div>
+      <div class="alert" id="alertRemise"></div>
+      <div class="form-grid c3">
+        <div><label class="form-label">Produit (code ou * pour tous)</label><input type="text" id="r_produit" placeholder="PRD-00001 ou *"/></div>
+        <div><label class="form-label">Type de remise</label>
+          <select id="r_type" onchange="onRemiseType()">
+            <option value="quantite">Quantité minimale</option>
+            <option value="wilaya">Wilaya spécifique</option>
+          </select>
+        </div>
+        <div><label class="form-label">Type de calcul</label>
+          <select id="r_calcul"><option value="pct">Pourcentage (%)</option><option value="fixe">Montant fixe (DA)</option></select>
+        </div>
+      </div>
+      <div class="form-grid">
+        <div id="r_seuil_wrap"><label class="form-label">Quantité minimale</label><input type="number" id="r_seuil" placeholder="2" min="1"/></div>
+        <div id="r_wilaya_wrap" style="display:none"><label class="form-label">N° Wilaya</label><input type="number" id="r_wilaya_id" placeholder="16" min="1" max="58"/></div>
+        <div><label class="form-label">Valeur (% ou DA)</label><input type="number" id="r_valeur" placeholder="10"/></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+        <div class="toggle-field"><div class="toggle on" id="tgl_r_actif" onclick="toggleField('r_actif')"></div><label class="form-label" style="margin:0">Active</label></div>
+        <button class="btn btn-success" onclick="saveRemise()">💾 Ajouter remise</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Remises configurées</span></div>
+      <table>
+        <thead><tr><th>Produit</th><th>Type</th><th>Seuil/Wilaya</th><th>Valeur</th><th>Calcul</th><th>Statut</th></tr></thead>
+        <tbody id="remisesBody"><tr><td colspan="6" class="loading">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== CODES PROMO ===== -->
+  <div class="tab-content" id="tab-promos">
+    <div class="page-title">🎟️ Codes Promo</div>
+    <div class="form-card">
+      <div class="form-title">Nouveau code promo</div>
+      <div class="alert" id="alertPromo"></div>
+      <div class="form-grid c3">
+        <div><label class="form-label">Code *</label><input type="text" id="cp_code" placeholder="PROMO10" style="text-transform:uppercase"/></div>
+        <div><label class="form-label">Produit (* = tous)</label><input type="text" id="cp_produit" value="*" placeholder="PRD-00001 ou *"/></div>
+        <div><label class="form-label">Type de calcul</label>
+          <select id="cp_calcul"><option value="pct">Pourcentage (%)</option><option value="fixe">Montant fixe (DA)</option></select>
+        </div>
+      </div>
+      <div class="form-grid c3">
+        <div><label class="form-label">Valeur (% ou DA) *</label><input type="number" id="cp_valeur" placeholder="10"/></div>
+        <div><label class="form-label">Date d'expiration</label><input type="date" id="cp_date_fin"/></div>
+        <div><label class="form-label">Limite d'utilisations (0 = illimité)</label><input type="number" id="cp_limite" value="0" min="0"/></div>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center;margin-top:4px">
+        <div class="toggle-field"><div class="toggle on" id="tgl_cp_actif" onclick="toggleField('cp_actif')"></div><label class="form-label" style="margin:0">Actif</label></div>
+        <button class="btn btn-success" onclick="savePromo()">💾 Créer le code</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <div class="table-header"><span class="table-title">Codes promo</span></div>
+      <table>
+        <thead><tr><th>Code</th><th>Produit</th><th>Valeur</th><th>Expiration</th><th>Utilisations</th><th>Statut</th></tr></thead>
+        <tbody id="promosBody"><tr><td colspan="6" class="loading">Chargement...</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ===== CONFIG ===== -->
+  <div class="tab-content" id="tab-config">
+    <div class="page-title">⚙️ Configuration</div>
+    <div class="form-card">
+      <div class="form-title">URL de l'API Apps Script</div>
+      <div class="form-field">
+        <label class="form-label">Colle ici l'URL de déploiement Apps Script</label>
+        <input type="text" id="cfg_api_url" placeholder="https://script.google.com/macros/s/.../exec"/>
+      </div>
+      <button class="btn btn-primary" onclick="saveConfig()">💾 Enregistrer</button>
+    </div>
+    <div class="form-card">
+      <div class="form-title">Générateur de lien produit</div>
+      <div class="form-grid">
+        <div><label class="form-label">Code produit</label><input type="text" id="gen_code" placeholder="PRD-00001"/></div>
+        <div><label class="form-label">URL de base (ton GitHub Pages)</label><input type="text" id="gen_base" placeholder="https://ton-pseudo.github.io/boutique"/></div>
+      </div>
+      <button class="btn btn-outline" onclick="genLink()">🔗 Générer le lien</button>
+      <div style="margin-top:10px;padding:10px;background:#f7f7f7;border-radius:8px;font-family:monospace;font-size:13px;display:none" id="genLinkResult"></div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+/* ================================================================
+   CONFIGURATION DASHBOARD
+================================================================ */
+let API_URL = localStorage.getItem('admin_api_url') || '';
+
+const toggleStates = {actif:false, liv_gratuite:false, promo_active:false, r_actif:true, cp_actif:true};
+
+function toggleField(id) {
+  toggleStates[id] = !toggleStates[id];
+  $('tgl_'+id).classList.toggle('on', toggleStates[id]);
+}
+
+const $ = id => document.getElementById(id);
+
+function showTab(name) {
+  document.querySelectorAll('.tab-content').forEach(t=>t.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  $('tab-'+name).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if(name==='stats') loadStats();
+  if(name==='commandes') loadCommandes();
+}
+
+/* ================================================================
+   STATS
+================================================================ */
+async function loadStats() {
+  if(!API_URL){$('statsCards').innerHTML='<div class="stat-card"><div class="stat-label" style="color:#e53935">⚠️ Configurez l\'URL API dans l\'onglet Configuration</div></div>';return;}
+  try {
+    const res = await fetch(`${API_URL}?action=getStats`);
+    const d = await res.json();
+
+    $('statsCards').innerHTML=`
+      <div class="stat-card"><div class="stat-val">${d.total||0}</div><div class="stat-label">Total commandes</div></div>
+      <div class="stat-card green"><div class="stat-val">${Math.round(d.ca||0).toLocaleString('fr-DZ')} DA</div><div class="stat-label">Chiffre d'affaires</div></div>
+      <div class="stat-card blue"><div class="stat-val">${d.total>0?Math.round((d.ca||0)/d.total).toLocaleString('fr-DZ'):0} DA</div><div class="stat-label">Panier moyen</div></div>
+      <div class="stat-card orange"><div class="stat-val">${Object.keys(d.parJour||{}).reduce((s,k)=>(d.parJour[k]>s?d.parJour[k]:s),0)}</div><div class="stat-label">Record / jour</div></div>`;
+
+    // Bar chart
+    const pj = d.parJour||{};
+    const keys = Object.keys(pj);
+    const max = Math.max(...Object.values(pj),1);
+    $('barChart').innerHTML = keys.map(k=>`
+      <div class="bar-col">
+        <div class="bar-val">${pj[k]||0}</div>
+        <div class="bar" style="height:${Math.round((pj[k]||0)/max*100)}px"></div>
+        <div class="bar-label">${k.slice(0,5)}</div>
+      </div>`).join('');
+
+    // Top wilayas
+    const tw = d.topWilayas||[];
+    const maxW = tw[0]?tw[0][1]:1;
+    $('topWilayas').innerHTML = tw.map(([w,n])=>`
+      <li class="top-item">
+        <span>${w}</span>
+        <div class="top-bar-wrap"><div class="top-bar" style="width:${Math.round(n/maxW*100)}%"></div></div>
+        <span><strong>${n}</strong></span>
+      </li>`).join('') || '<li class="loading">Aucune donnée</li>';
+
+  } catch(e){$('statsCards').innerHTML='<div class="stat-card"><div class="stat-label" style="color:#e53935">Erreur de connexion à l\'API</div></div>';}
+}
+
+/* ================================================================
+   COMMANDES
+================================================================ */
+let allCommandes = [];
+
+async function loadCommandes() {
+  if(!API_URL){$('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">Configurez l\'URL API</td></tr>';return;}
+  $('commandesBody').innerHTML='<tr><td colspan="10" class="loading"><span class="spinner-sm"></span>Chargement...</td></tr>';
+  try {
+    const res=await fetch(`${API_URL}?action=getStats`);
+    // Pour la démo on utilise getStats — en production ajouter getCommandes dans Apps Script
+    $('commandesCount').textContent='Commandes (connecté à Sheets)';
+    $('commandesBody').innerHTML='<tr><td colspan="10" class="loading">Voir directement dans Google Sheets pour la liste complète.<br/>Le dashboard stats est chargé ci-dessus.</td></tr>';
+  } catch(e){$('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">Erreur de connexion</td></tr>';}
+}
+
+function filterCommandes(q) {
+  const rows=document.querySelectorAll('#commandesBody tr');
+  rows.forEach(r=>{ r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'; });
+}
+
+/* ================================================================
+   PRODUITS (lecture/écriture via Apps Script)
+================================================================ */
+function resetProduit() {
+  ['p_code','p_prix','p_nom_fr','p_nom_ar','p_sub_fr','p_sub_ar',
+   'p_desc_fr','p_desc_ar','p_conds_fr','p_conds_ar','p_images','p_prix_barre'].forEach(id=>{$(id).value='';});
+  ['actif','liv_gratuite','promo_active'].forEach(id=>{toggleStates[id]=false;$('tgl_'+id).classList.remove('on');});
+}
+
+function saveProduit() {
+  const code=$('p_code').value.trim().toUpperCase();
+  if(!code||!$('p_prix').value||!$('p_nom_fr').value){
+    showAlert('alertProduit','error','Remplissez au moins le code, le prix et le nom FR.');return;
+  }
+  // Construction de la ligne à ajouter dans Sheets
+  const row=[
+    code,$('p_nom_fr').value,$('p_nom_ar').value,
+    $('p_sub_fr').value,$('p_sub_ar').value,
+    $('p_desc_fr').value,$('p_desc_ar').value,
+    $('p_conds_fr').value,$('p_conds_ar').value,
+    parseFloat($('p_prix').value)||0,
+    parseFloat($('p_prix_barre').value)||0,
+    $('p_images').value,
+    '',$('p_theme').value,$('p_langue').value,
+    $('p_transporteur').value,
+    toggleStates.liv_gratuite,toggleStates.promo_active,
+    $('p_flash').value||'',
+    toggleStates.actif
+  ];
+  // Afficher la ligne à copier dans Sheets
+  showAlert('alertProduit','success',`✅ Données prêtes ! Ajoutez cette ligne dans la feuille "Produits" de votre Google Sheets.\nLien produit : index.html?p=${code}`);
+
+  // Optionnel : copier dans le presse-papiers
+  navigator.clipboard.writeText(row.join('\t')).catch(()=>{});
+
+  // Ajouter dans le tableau local
+  const tbody=$('produitsBody');
+  if(tbody.querySelector('.loading')) tbody.innerHTML='';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><code>${code}</code></td><td>${$('p_nom_fr').value}</td><td><strong>${parseFloat($('p_prix').value).toLocaleString('fr-DZ')} DA</strong></td>
+    <td>${$('p_transporteur').value}</td><td>${$('p_theme').value}</td>
+    <td><span class="badge ${toggleStates.actif?'green':'gray'}">${toggleStates.actif?'Actif':'Inactif'}</span></td>
+    <td><button class="btn btn-outline btn-sm" onclick="copyProduitLink('${code}')">🔗</button></td>`;
+  tbody.prepend(tr);
+}
+
+function copyLink(){
+  const code=$('p_code').value.trim().toUpperCase();
+  if(!code){showAlert('alertProduit','error','Entrez d\'abord un code produit.');return;}
+  copyProduitLink(code);
+}
+
+function copyProduitLink(code){
+  const base=$('gen_base')?$('gen_base').value.trim():window.location.origin;
+  const link=`${base}/index.html?p=${code}`;
+  navigator.clipboard.writeText(link).then(()=>alert('Lien copié : '+link));
+}
+
+/* ================================================================
+   REMISES
+================================================================ */
+function onRemiseType(){
+  const t=$('r_type').value;
+  $('r_seuil_wrap').style.display=t==='quantite'?'block':'none';
+  $('r_wilaya_wrap').style.display=t==='wilaya'?'block':'none';
+}
+
+function saveRemise(){
+  const prod=$('r_produit').value.trim()||'*';
+  const type=$('r_type').value;
+  const valeur=$('r_valeur').value;
+  if(!valeur){showAlert('alertRemise','error','Entrez une valeur.');return;}
+  const seuil=type==='quantite'?($('r_seuil').value||2):'';
+  const wil=type==='wilaya'?($('r_wilaya_id').value||''):'';
+  showAlert('alertRemise','success','✅ Ajoutez cette remise dans la feuille "Remises" de Google Sheets.');
+  const tbody=$('remisesBody');
+  if(tbody.querySelector('.loading')) tbody.innerHTML='';
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td>${prod}</td><td>${type}</td><td>${type==='quantite'?'Min '+seuil+' articles':'Wilaya '+wil}</td>
+    <td>${valeur}${$('r_calcul').value==='pct'?'%':' DA'}</td><td>${$('r_calcul').value}</td>
+    <td><span class="badge ${toggleStates.r_actif?'green':'gray'}">${toggleStates.r_actif?'Active':'Inactive'}</span></td>`;
+  tbody.prepend(tr);
+}
+
+/* ================================================================
+   CODES PROMO
+================================================================ */
+function savePromo(){
+  const code=$('cp_code').value.trim().toUpperCase();
+  const valeur=$('cp_valeur').value;
+  if(!code||!valeur){showAlert('alertPromo','error','Code et valeur obligatoires.');return;}
+  showAlert('alertPromo','success',`✅ Code "${code}" créé ! Ajoutez-le dans la feuille "Codes_Promo" de Google Sheets.`);
+  const tbody=$('promosBody');
+  if(tbody.querySelector('.loading')) tbody.innerHTML='';
+  const fin=$('cp_date_fin').value;
+  const limite=parseInt($('cp_limite').value)||0;
+  const tr=document.createElement('tr');
+  tr.innerHTML=`<td><code style="font-size:13px;font-weight:700">${code}</code></td>
+    <td>${$('cp_produit').value||'*'}</td>
+    <td><strong>${valeur}${$('cp_calcul').value==='pct'?'%':' DA'}</strong></td>
+    <td>${fin||'Illimité'}</td>
+    <td>0 / ${limite||'∞'}</td>
+    <td><span class="badge ${toggleStates.cp_actif?'green':'gray'}">${toggleStates.cp_actif?'Actif':'Inactif'}</span></td>`;
+  tbody.prepend(tr);
+}
+
+/* ================================================================
+   CONFIG
+================================================================ */
+function saveConfig(){
+  API_URL=$('cfg_api_url').value.trim();
+  localStorage.setItem('admin_api_url',API_URL);
+  alert('✅ URL sauvegardée !');
+}
+
+function genLink(){
+  const code=$('gen_code').value.trim().toUpperCase();
+  const base=($('gen_base').value.trim()||window.location.origin).replace(/\/$/,'');
+  if(!code){alert('Entrez un code produit.');return;}
+  const link=`${base}/index.html?p=${code}`;
+  $('genLinkResult').textContent=link;
+  $('genLinkResult').style.display='block';
+  navigator.clipboard.writeText(link);
+}
+
+function showAlert(id,type,msg){
+  const el=$(id);
+  el.className='alert '+type;
+  el.textContent=msg;
+  el.style.display='block';
+  setTimeout(()=>el.style.display='none',5000);
+}
+
+/* Init */
+if(API_URL) $('cfg_api_url').value=API_URL;
+$('tgl_r_actif').classList.add('on');
+$('tgl_cp_actif').classList.add('on');
+loadStats();
+</script>
+</body>
+</html>

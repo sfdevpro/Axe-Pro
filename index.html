@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Chargement...</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body.theme-classic {
+      --c-bg:#f2f2f2; --c-card:#fff; --c-primary:#111; --c-text:#111;
+      --c-text2:#555; --c-text3:#888; --c-border:#ddd; --c-input-bg:#fff;
+      --c-recap-bg:#f7f7f7; --c-section-border:#f0f0f0; --c-radio-sel:#f5f5f5;
+      --c-btn-text:#fff; --c-tag-bg:#e8f0fe; --c-tag-text:#1a56db; --c-readonly:#f7f7f7;
+    }
+    body.theme-green {
+      --c-bg:#f0f7f4; --c-card:#fff; --c-primary:#0d6e4f; --c-text:#0a3d2b;
+      --c-text2:#2d6b52; --c-text3:#7aab94; --c-border:#b8ddd0; --c-input-bg:#fff;
+      --c-recap-bg:#e8f5ef; --c-section-border:#c8e8db; --c-radio-sel:#e0f5ec;
+      --c-btn-text:#fff; --c-tag-bg:#d4f0e4; --c-tag-text:#0a6640; --c-readonly:#f0f7f4;
+    }
+    body.theme-bordeaux {
+      --c-bg:#faf5f5; --c-card:#fff; --c-primary:#7b1d1d; --c-text:#3d0e0e;
+      --c-text2:#7b3535; --c-text3:#b88080; --c-border:#e0bfbf; --c-input-bg:#fff;
+      --c-recap-bg:#fdf0f0; --c-section-border:#f0d5d5; --c-radio-sel:#fdf0f0;
+      --c-btn-text:#fff; --c-tag-bg:#fde8e8; --c-tag-text:#7b1d1d; --c-readonly:#fdf5f5;
+    }
+    body.theme-blue {
+      --c-bg:#f0f4ff; --c-card:#fff; --c-primary:#1a56db; --c-text:#0f172a;
+      --c-text2:#334155; --c-text3:#94a3b8; --c-border:#bfdbfe; --c-input-bg:#fff;
+      --c-recap-bg:#eff6ff; --c-section-border:#dbeafe; --c-radio-sel:#eff6ff;
+      --c-btn-text:#fff; --c-tag-bg:#dbeafe; --c-tag-text:#1e40af; --c-readonly:#f8faff;
+    }
+
+    body { background:var(--c-bg); color:var(--c-text); font-family:'Segoe UI',Tahoma,sans-serif; transition:background 0.3s; }
+
+    /* TOPBAR */
+    .topbar { position:fixed; top:12px; right:12px; z-index:900; display:flex; gap:8px; align-items:center; }
+    [dir=rtl] .topbar { right:auto; left:12px; }
+    .lang-toggle,.theme-toggle { display:flex; border:1px solid var(--c-border); border-radius:8px; overflow:hidden; background:var(--c-card); box-shadow:0 2px 8px rgba(0,0,0,0.12); }
+    .lang-btn { padding:7px 14px; font-size:13px; font-weight:500; background:transparent; border:none; cursor:pointer; color:var(--c-text3); }
+    .lang-btn.active { background:var(--c-primary); color:var(--c-btn-text); }
+    .theme-btn { width:26px; height:32px; border:none; cursor:pointer; transition:transform 0.15s; }
+    .theme-btn:hover { transform:scale(1.15); }
+    .theme-btn.active { outline:2px solid var(--c-primary); outline-offset:1px; }
+    .t-classic{background:#111} .t-green{background:#0d6e4f} .t-bordeaux{background:#7b1d1d} .t-blue{background:#1a56db}
+
+    /* BANNER */
+    .banner { width:100%; height:260px; position:relative; overflow:hidden; background:#222; }
+    .banner img { width:100%; height:100%; object-fit:cover; opacity:0.72; }
+    .banner-overlay { position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; padding:1rem; }
+    .banner-title { font-size:26px; font-weight:700; color:#fff; text-align:center; text-shadow:0 2px 8px rgba(0,0,0,0.5); margin-bottom:6px; }
+    .banner-sub { font-size:14px; color:rgba(255,255,255,0.85); text-align:center; }
+    .banner-badges { display:flex; gap:8px; margin-top:10px; flex-wrap:wrap; justify-content:center; }
+    .banner-badge { background:rgba(255,255,255,0.9); color:#111; font-size:12px; font-weight:600; padding:4px 12px; border-radius:20px; }
+    .banner-badge.accent { background:var(--c-primary); color:#fff; }
+    .banner-price { margin-top:10px; background:var(--c-card); color:var(--c-primary); font-size:18px; font-weight:700; padding:6px 20px; border-radius:30px; }
+    .banner-old-price { font-size:13px; color:rgba(255,255,255,0.7); text-decoration:line-through; margin-top:4px; }
+
+    /* COUNTDOWN */
+    .countdown-wrap { background:var(--c-primary); padding:8px 0; text-align:center; }
+    .countdown-inner { font-size:13px; color:#fff; font-weight:500; display:flex; align-items:center; justify-content:center; gap:8px; }
+    .cd-box { background:rgba(255,255,255,0.2); border-radius:6px; padding:4px 8px; font-size:15px; font-weight:700; min-width:36px; }
+
+    /* LAYOUT */
+    .page { max-width:600px; margin:0 auto; padding:0 0 3rem; }
+    .section { background:var(--c-card); margin:12px 12px 0; border-radius:14px; padding:18px; box-shadow:0 1px 4px rgba(0,0,0,0.06); }
+    .section-title { font-size:14px; font-weight:700; color:var(--c-text); margin-bottom:12px; padding-bottom:8px; border-bottom:2px solid var(--c-section-border); display:flex; align-items:center; gap:8px; }
+    .section-dot { width:8px; height:8px; border-radius:50%; background:var(--c-primary); flex-shrink:0; }
+
+    /* GALERIE */
+    .gallery-main { width:100%; height:260px; border-radius:10px; overflow:hidden; background:#eee; margin-bottom:10px; cursor:pointer; }
+    .gallery-main img { width:100%; height:100%; object-fit:cover; transition:transform 0.3s; }
+    .gallery-main img:hover { transform:scale(1.03); }
+    .gallery-thumbs { display:flex; gap:8px; overflow-x:auto; padding-bottom:4px; }
+    .gallery-thumbs::-webkit-scrollbar { height:3px; }
+    .gallery-thumbs::-webkit-scrollbar-thumb { background:var(--c-border); border-radius:4px; }
+    .thumb { width:70px; height:70px; border-radius:8px; overflow:hidden; flex-shrink:0; cursor:pointer; border:2px solid transparent; transition:border-color 0.15s; }
+    .thumb.active { border-color:var(--c-primary); }
+    .thumb img { width:100%; height:100%; object-fit:cover; }
+
+    /* DESC & CONDITIONS */
+    .desc-text { font-size:14px; color:var(--c-text2); line-height:1.8; white-space:pre-line; }
+    .cond-list { list-style:none; }
+    .cond-list li { font-size:13px; color:var(--c-text2); padding:7px 0; border-bottom:1px solid var(--c-section-border); display:flex; align-items:flex-start; gap:8px; line-height:1.5; }
+    .cond-list li:last-child { border-bottom:none; }
+    .cond-dot { width:6px; height:6px; border-radius:50%; background:var(--c-primary); flex-shrink:0; margin-top:6px; }
+
+    /* FORM */
+    h2.form-title { font-size:15px; font-weight:700; color:var(--c-text); margin-bottom:16px; display:flex; align-items:center; gap:8px; }
+    label { display:block; font-size:12px; color:var(--c-text2); margin-bottom:5px; font-weight:500; }
+    .field { margin-bottom:14px; }
+    .row2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom:14px; }
+    input[type=text],input[type=tel],select {
+      width:100%; padding:9px 12px; font-size:14px; color:var(--c-text);
+      border:1px solid var(--c-border); border-radius:8px; background:var(--c-input-bg);
+      outline:none; transition:border-color 0.15s; font-family:inherit;
+    }
+    input:focus,select:focus { border-color:var(--c-primary); }
+    select:disabled { background:var(--c-readonly); color:var(--c-text3); }
+    input[type=text][readonly] { background:var(--c-readonly); color:var(--c-text3); cursor:default; border-color:var(--c-section-border); user-select:none; }
+
+    /* RADIO */
+    .radio-group { display:flex; gap:10px; margin-top:4px; }
+    .radio-opt { flex:1; border:1px solid var(--c-border); border-radius:8px; padding:10px 12px; cursor:pointer; display:flex; align-items:center; gap:8px; font-size:13px; color:var(--c-text); transition:background 0.12s; user-select:none; }
+    .radio-opt:hover { background:var(--c-recap-bg); }
+    .radio-opt.selected { border:2px solid var(--c-primary); background:var(--c-radio-sel); }
+    .radio-dot { width:14px; height:14px; border-radius:50%; border:2px solid var(--c-border); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+    .radio-dot.on { border-color:var(--c-primary); }
+    .radio-dot.on::after { content:''; width:7px; height:7px; border-radius:50%; background:var(--c-primary); display:block; }
+
+    /* QTY */
+    .qty-wrap { display:flex; align-items:center; gap:10px; margin-top:4px; }
+    .qty-btn { width:34px; height:34px; border-radius:8px; border:1px solid var(--c-border); background:var(--c-input-bg); font-size:18px; cursor:pointer; color:var(--c-text); display:flex; align-items:center; justify-content:center; transition:background 0.12s; flex-shrink:0; }
+    .qty-btn:hover { background:var(--c-recap-bg); }
+    .qty-val { font-size:15px; font-weight:600; color:var(--c-text); min-width:32px; text-align:center; }
+    .qty-unit { font-size:12px; color:var(--c-text3); }
+
+    /* PROMO */
+    .promo-wrap { display:flex; gap:8px; margin-top:4px; }
+    .promo-wrap input { flex:1; }
+    .promo-btn { padding:9px 14px; font-size:13px; font-weight:600; background:var(--c-primary); color:var(--c-btn-text); border:none; border-radius:8px; cursor:pointer; white-space:nowrap; }
+    .promo-btn:hover { opacity:0.85; }
+    .promo-ok { font-size:12px; color:#2e7d32; margin-top:4px; display:none; font-weight:500; }
+    .promo-err { font-size:12px; color:#e53935; margin-top:4px; display:none; }
+
+    /* RECAP */
+    hr { border:none; border-top:1px solid var(--c-section-border); margin:1.25rem 0; }
+    .recap { background:var(--c-recap-bg); border-radius:12px; padding:14px 16px; margin-bottom:1.25rem; }
+    .recap-row { display:flex; justify-content:space-between; font-size:13px; padding:4px 0; color:var(--c-text2); }
+    .recap-row span:last-child { color:var(--c-text); font-weight:500; direction:ltr; unicode-bidi:embed; }
+    .recap-row.remise span:last-child { color:#2e7d32; }
+    .recap-total { display:flex; justify-content:space-between; font-size:15px; font-weight:600; padding-top:10px; margin-top:6px; border-top:1px solid var(--c-border); color:var(--c-text); }
+    .recap-total span:last-child { direction:ltr; unicode-bidi:embed; }
+    .tag { font-size:11px; background:var(--c-tag-bg); color:var(--c-tag-text); padding:2px 8px; border-radius:20px; display:inline-block; margin:0 4px; vertical-align:middle; }
+
+    /* ERRORS */
+    .err { font-size:12px; color:#e53935; margin-top:4px; display:none; }
+    .req { color:#e53935; }
+
+    /* BUTTON */
+    .btn-submit { width:100%; padding:13px; font-size:15px; font-weight:700; background:var(--c-primary); color:var(--c-btn-text); border:none; border-radius:10px; cursor:pointer; transition:opacity 0.15s; font-family:inherit; }
+    .btn-submit:hover { opacity:0.85; }
+    .btn-submit:disabled { opacity:0.45; cursor:not-allowed; }
+    .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.4); border-top-color:#fff; border-radius:50%; animation:spin 0.7s linear infinite; vertical-align:middle; margin-right:6px; }
+    @keyframes spin { to { transform:rotate(360deg); } }
+
+    /* LOADING / SUCCESS */
+    .page-loader { position:fixed; inset:0; background:var(--c-bg); display:flex; flex-direction:column; align-items:center; justify-content:center; z-index:9999; gap:12px; }
+    .page-loader .sp { width:36px; height:36px; border:3px solid var(--c-border); border-top-color:var(--c-primary); border-radius:50%; animation:spin 0.8s linear infinite; }
+    .page-loader p { font-size:14px; color:var(--c-text3); }
+    .init-msg { text-align:center; padding:3rem 0; color:var(--c-text3); font-size:14px; }
+    .success { text-align:center; padding:2.5rem 1rem; display:none; }
+    .success-icon { width:56px; height:56px; border-radius:50%; background:#e6f4ea; display:flex; align-items:center; justify-content:center; margin:0 auto 1rem; }
+    .success-icon svg { width:26px; height:26px; stroke:#2e7d32; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+    .success-title { font-size:17px; font-weight:700; margin-bottom:8px; color:var(--c-text); }
+    .success-sub { font-size:13px; color:var(--c-text2); line-height:1.9; }
+
+    /* ERROR PAGE */
+    .error-page { text-align:center; padding:4rem 1rem; display:none; }
+    .error-page h2 { font-size:18px; color:#e53935; margin-bottom:8px; }
+    .error-page p { font-size:14px; color:var(--c-text3); }
+
+    /* RTL */
+    [dir=rtl] { font-family:'Segoe UI',Tahoma,'Noto Naskh Arabic','Arabic Typesetting',sans-serif; }
+    [dir=rtl] .recap-row,[dir=rtl] .recap-total { flex-direction:row-reverse; }
+    [dir=rtl] .cond-list li,[dir=rtl] .section-title,[dir=rtl] .form-title { flex-direction:row-reverse; }
+    [dir=rtl] .topbar { right:auto; left:12px; }
+
+    /* LIGHTBOX */
+    .lightbox { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.92); z-index:999; align-items:center; justify-content:center; }
+    .lightbox.open { display:flex; }
+    .lightbox img { max-width:95vw; max-height:90vh; border-radius:8px; }
+    .lb-close { position:fixed; top:16px; right:20px; color:#fff; font-size:32px; cursor:pointer; }
+
+    @media(max-width:480px) {
+      .row2 { grid-template-columns:1fr; }
+      .banner { height:200px; }
+      .gallery-main { height:200px; }
+      .section { margin:10px 8px 0; padding:14px; }
+      .topbar { top:8px; right:8px; gap:6px; }
+    }
+  </style>
+</head>
+<body class="theme-classic">
+
+<!-- Page loader -->
+<div class="page-loader" id="pageLoader">
+  <div class="sp"></div>
+  <p id="loaderMsg">Chargement du produit...</p>
+</div>
+
+<!-- Topbar -->
+<div class="topbar" id="topbar" style="display:none">
+  <div class="lang-toggle">
+    <button class="lang-btn" id="btnFR" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" id="btnAR" onclick="setLang('ar')">ع</button>
+  </div>
+  <div class="theme-toggle">
+    <button class="theme-btn t-classic"  id="tb-classic"  onclick="setTheme('classic')"  title="Classique"></button>
+    <button class="theme-btn t-green"    id="tb-green"    onclick="setTheme('green')"    title="Vert"></button>
+    <button class="theme-btn t-bordeaux" id="tb-bordeaux" onclick="setTheme('bordeaux')" title="Bordeaux"></button>
+    <button class="theme-btn t-blue"     id="tb-blue"     onclick="setTheme('blue')"     title="Bleu"></button>
+  </div>
+</div>
+
+<!-- Lightbox -->
+<div class="lightbox" id="lightbox" onclick="closeLightbox()">
+  <span class="lb-close">&times;</span>
+  <img id="lbImg" src="" alt=""/>
+</div>
+
+<!-- Countdown (affiché si flash sale active) -->
+<div class="countdown-wrap" id="countdownWrap" style="display:none">
+  <div class="countdown-inner">
+    <span id="cdLabel">⏰ Offre expire dans</span>
+    <span class="cd-box" id="cdH">00</span>:
+    <span class="cd-box" id="cdM">00</span>:
+    <span class="cd-box" id="cdS">00</span>
+  </div>
+</div>
+
+<!-- Banner -->
+<div class="banner" id="bannerEl" style="display:none">
+  <img id="bannerImg" src="" alt="banner"/>
+  <div class="banner-overlay">
+    <div class="banner-title" id="bannerTitle"></div>
+    <div class="banner-sub"   id="bannerSub"></div>
+    <div class="banner-badges" id="bannerBadges"></div>
+    <div class="banner-old-price" id="bannerOldPrice" style="display:none"></div>
+    <div class="banner-price" id="bannerPrice"></div>
+  </div>
+</div>
+
+<div class="page" id="mainPage" style="display:none">
+
+  <!-- Galerie -->
+  <div class="section">
+    <div class="section-title"><span class="section-dot"></span><span id="lGalerie">Photos du produit</span></div>
+    <div class="gallery-main"><img id="mainImg" src="" alt="" onclick="openLightbox(this.src)"/></div>
+    <div class="gallery-thumbs" id="thumbsWrap"></div>
+  </div>
+
+  <!-- Description -->
+  <div class="section">
+    <div class="section-title"><span class="section-dot"></span><span id="lDesc">Description</span></div>
+    <p class="desc-text" id="descText"></p>
+  </div>
+
+  <!-- Conditions -->
+  <div class="section">
+    <div class="section-title"><span class="section-dot"></span><span id="lCond">Conditions</span></div>
+    <ul class="cond-list" id="condList"></ul>
+  </div>
+
+  <!-- Formulaire -->
+  <div class="section">
+    <h2 class="form-title"><span class="section-dot"></span><span id="pageTitle">Confirmer ma commande</span></h2>
+
+    <div id="initMsg" class="init-msg">Chargement...</div>
+
+    <div id="formArea" style="display:none">
+
+      <div class="field">
+        <label id="lCode">Code produit</label>
+        <input type="text" id="codeProduit" readonly tabindex="-1"/>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label id="lNom">Nom <span class="req">*</span></label>
+          <input type="text" id="nom" placeholder="Benali"/>
+          <div class="err" id="errNom"></div>
+        </div>
+        <div>
+          <label id="lPrenom">Prénom <span class="req">*</span></label>
+          <input type="text" id="prenom" placeholder="Ahmed"/>
+          <div class="err" id="errPrenom"></div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label id="lTel">Téléphone <span class="req">*</span></label>
+          <input type="tel" id="tel" placeholder="05 XX XX XX XX"/>
+          <div class="err" id="errTel"></div>
+        </div>
+        <div>
+          <label id="lQte">Quantité</label>
+          <div class="qty-wrap">
+            <button class="qty-btn" onclick="changeQty(-1)" type="button">−</button>
+            <span class="qty-val" id="qtyVal">1</span>
+            <button class="qty-btn" onclick="changeQty(1)"  type="button">+</button>
+            <span class="qty-unit" id="qtyUnit">article</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="row2">
+        <div>
+          <label id="lWilaya">Wilaya <span class="req">*</span></label>
+          <select id="wilaya" onchange="onWilaya()"><option value="">--</option></select>
+          <div class="err" id="errWilaya"></div>
+        </div>
+        <div>
+          <label id="lCommune">Commune <span class="req">*</span></label>
+          <select id="commune" disabled><option value="">--</option></select>
+          <div class="err" id="errCommune"></div>
+        </div>
+      </div>
+
+      <div class="field">
+        <label id="lLivraison">Type de livraison</label>
+        <div class="radio-group">
+          <div class="radio-opt" id="opt-domicile" onclick="setLivraison('domicile')">
+            <div class="radio-dot" id="dot-domicile"></div>
+            <span id="txtDomicile">À domicile</span>
+          </div>
+          <div class="radio-opt selected" id="opt-bureau" onclick="setLivraison('bureau')">
+            <div class="radio-dot on" id="dot-bureau"></div>
+            <span id="txtBureau">Au bureau</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Code promo -->
+      <div class="field" id="promoSection">
+        <label id="lPromo">Code promo</label>
+        <div class="promo-wrap">
+          <input type="text" id="promoInput" placeholder="Ex: PROMO10"/>
+          <button class="promo-btn" onclick="appliquerPromo()" id="promoBtn">Appliquer</button>
+        </div>
+        <div class="promo-ok" id="promoOk"></div>
+        <div class="promo-err" id="promoErr"></div>
+      </div>
+
+      <hr>
+
+      <div class="recap">
+        <div class="recap-row"><span id="lPrix">Prix unitaire</span><span id="recapPrix">— DA</span></div>
+        <div class="recap-row"><span id="lSousTotal">Sous-total</span><span id="recapSousTotal">— DA</span></div>
+        <div class="recap-row remise" id="rowRemiseQte" style="display:none"><span id="lRemiseQte">Remise quantité</span><span id="recapRemiseQte">— DA</span></div>
+        <div class="recap-row remise" id="rowRemisePromo" style="display:none"><span id="lRemisePromo">Code promo</span><span id="recapRemisePromo">— DA</span></div>
+        <div class="recap-row remise" id="rowRemiseWilaya" style="display:none"><span id="lRemiseWilaya">Remise wilaya</span><span id="recapRemiseWilaya">— DA</span></div>
+        <div class="recap-row">
+          <span id="lFraisWrap">Frais <span class="tag" id="recapTag">bureau</span></span>
+          <span id="recapFrais">— DA</span>
+        </div>
+        <div class="recap-total"><span id="lTotal">Total</span><span id="recapTotal">— DA</span></div>
+      </div>
+
+      <div class="err" id="errGlobal" style="margin-bottom:10px"></div>
+      <button class="btn-submit" id="btnSubmit" onclick="submit()">Confirmer</button>
+    </div>
+
+    <div class="success" id="successArea">
+      <div class="success-icon"><svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+      <p class="success-title" id="successTitle"></p>
+      <p class="success-sub"   id="successMsg"></p>
+    </div>
+  </div>
+</div>
+
+<!-- Error page -->
+<div class="error-page" id="errorPage">
+  <h2>Produit introuvable</h2>
+  <p>Vérifiez le lien ou contactez le vendeur.</p>
+</div>
+
+<script>
+/* ================================================================
+   URL Apps Script — seule constante à modifier
+================================================================ */
+const API_URL = "COLLE_ICI_URL_APPS_SCRIPT";
+/* ================================================================ */
+
+const THEMES = ['classic','green','bordeaux','blue'];
+let lang = 'fr', livraison = 'bureau', quantite = 1;
+let produit = {}, tarifs = {}, remises = {};
+let allWilayas = [], allCommunes = [];
+let promoAppliquee = null, remiseWilayaVal = 0;
+
+const $ = id => document.getElementById(id);
+const fmt = n => Math.round(n).toLocaleString('fr-DZ') + ' DA';
+
+/* ---- Traductions UI ---- */
+const UI = {
+  fr:{
+    loading:'Chargement du produit...',
+    pageTitle:'Confirmer ma commande', lGalerie:'Photos du produit',
+    lDesc:'Description', lCond:'Conditions de commande',
+    nom:'Nom', prenom:'Prénom', tel:'Téléphone', wilaya:'Wilaya', commune:'Commune',
+    livraison:'Type de livraison', domicile:'À domicile', bureau:'Au bureau',
+    prix:'Prix unitaire', sousTotal:'Sous-total', frais:'Frais de livraison',
+    total:'Total à payer', btn:'Confirmer la commande', codeProduit:'Code produit',
+    qte:'Quantité', qteUnit:'article', fraisGratuit:'Livraison offerte',
+    select:'-- Sélectionner --', selectW:'-- Sélectionner wilaya --',
+    successTitle:'Commande confirmée !',
+    errReq:'Champ obligatoire', errTel:'Numéro invalide (ex: 05xxxxxxxx)',
+    errGlobal:'Veuillez remplir tous les champs obligatoires.',
+    sending:'Envoi en cours...', errSend:"Erreur d'envoi. Réessayez.",
+    promo:'Code promo', promoBtn:'Appliquer',
+    promoOk:'✅ Code appliqué !', promoErrInvalid:'Code invalide.',
+    promoErrUsed:'Code déjà utilisé.', promoErrExpired:'Code expiré.',
+    remiseQte:'Remise quantité', remisePromo:'Réduction code promo',
+    remiseWilaya:'Remise wilaya', cdLabel:'⏰ Offre expire dans',
+    ph_nom:'Benali', ph_prenom:'Ahmed', ph_tel:'05 XX XX XX XX'
+  },
+  ar:{
+    loading:'جاري تحميل المنتج...',
+    pageTitle:'تأكيد طلبي', lGalerie:'صور المنتج',
+    lDesc:'الوصف', lCond:'شروط الطلب',
+    nom:'اللقب', prenom:'الاسم', tel:'رقم الهاتف', wilaya:'الولاية', commune:'البلدية',
+    livraison:'نوع التوصيل', domicile:'توصيل للمنزل', bureau:'توصيل للمكتب',
+    prix:'سعر الوحدة', sousTotal:'المجموع الجزئي', frais:'تكاليف التوصيل',
+    total:'المبلغ الإجمالي', btn:'تأكيد الطلب', codeProduit:'رمز المنتج',
+    qte:'الكمية', qteUnit:'قطعة', fraisGratuit:'التوصيل مجاني',
+    select:'-- اختر --', selectW:'-- اختر الولاية أولاً --',
+    successTitle:'تم تأكيد الطلب !',
+    errReq:'هذا الحقل إلزامي', errTel:'رقم الهاتف غير صحيح',
+    errGlobal:'يرجى ملء جميع الحقول الإلزامية.',
+    sending:'جاري الإرسال...', errSend:'خطأ في الإرسال. حاول مجدداً.',
+    promo:'كود الخصم', promoBtn:'تطبيق',
+    promoOk:'✅ تم تطبيق الكود !', promoErrInvalid:'كود غير صالح.',
+    promoErrUsed:'تم استخدام الكود.', promoErrExpired:'الكود منتهي.',
+    remiseQte:'خصم الكمية', remisePromo:'خصم كود الترويج',
+    remiseWilaya:'خصم الولاية', cdLabel:'⏰ العرض ينتهي خلال',
+    ph_nom:'بن علي', ph_prenom:'أحمد', ph_tel:'05 XX XX XX XX'
+  }
+};
+
+/* ---- Thème ---- */
+function setTheme(t) {
+  document.body.className = 'theme-' + t;
+  THEMES.forEach(n => $('tb-'+n).classList.toggle('active', n===t));
+}
+
+/* ---- Langue ---- */
+function setLang(l) {
+  lang = l;
+  const isAR = l==='ar';
+  document.documentElement.setAttribute('lang', l);
+  document.body.setAttribute('dir', isAR ? 'rtl' : 'ltr');
+  $('btnFR').classList.toggle('active', l==='fr');
+  $('btnAR').classList.toggle('active', l==='ar');
+  const u = UI[l];
+  $('pageTitle').textContent   = u.pageTitle;
+  $('lGalerie').textContent    = u.lGalerie;
+  $('lDesc').textContent       = u.lDesc;
+  $('lCond').textContent       = u.lCond;
+  $('lCode').textContent       = u.codeProduit;
+  $('lNom').innerHTML          = u.nom    + ' <span class="req">*</span>';
+  $('lPrenom').innerHTML       = u.prenom + ' <span class="req">*</span>';
+  $('lTel').innerHTML          = u.tel    + ' <span class="req">*</span>';
+  $('lWilaya').innerHTML       = u.wilaya + ' <span class="req">*</span>';
+  $('lCommune').innerHTML      = u.commune+ ' <span class="req">*</span>';
+  $('lLivraison').textContent  = u.livraison;
+  $('txtDomicile').textContent = u.domicile;
+  $('txtBureau').textContent   = u.bureau;
+  $('lPrix').textContent       = u.prix;
+  $('lSousTotal').textContent  = u.sousTotal;
+  $('lTotal').textContent      = u.total;
+  $('btnSubmit').textContent   = u.btn;
+  $('lQte').textContent        = u.qte;
+  $('qtyUnit').textContent     = u.qteUnit;
+  $('lPromo').textContent      = u.promo;
+  $('promoBtn').textContent    = u.promoBtn;
+  $('lRemiseQte').textContent  = u.remiseQte;
+  $('lRemisePromo').textContent= u.remisePromo;
+  $('lRemiseWilaya').textContent = u.remiseWilaya;
+  $('cdLabel').textContent     = u.cdLabel;
+  $('nom').placeholder         = u.ph_nom;
+  $('prenom').placeholder      = u.ph_prenom;
+  $('tel').placeholder         = u.ph_tel;
+  $('errNom').textContent      = u.errReq;
+  $('errPrenom').textContent   = u.errReq;
+  $('errTel').textContent      = u.errTel;
+  $('errWilaya').textContent   = u.errReq;
+  $('errCommune').textContent  = u.errReq;
+  $('errGlobal').textContent   = u.errGlobal;
+  // Textes produit
+  buildProduit();
+  updateTagLabel();
+  rebuildWilayas();
+  const wId = $('wilaya').value;
+  if (wId) rebuildCommunes(wId); else { $('commune').innerHTML=`<option value="">${u.selectW}</option>`; $('commune').disabled=true; }
+  updateRecap();
+}
+
+/* ---- Produit textes ---- */
+function buildProduit() {
+  if (!produit.nom_fr) return;
+  const nom  = lang==='ar' ? (produit.nom_ar||produit.nom_fr) : produit.nom_fr;
+  const sub  = lang==='ar' ? (produit.sous_titre_ar||produit.sous_titre_fr) : produit.sous_titre_fr;
+  const desc = lang==='ar' ? (produit.description_ar||produit.description_fr) : produit.description_fr;
+  const conds= lang==='ar' ? (produit.conditions_ar||produit.conditions_fr) : produit.conditions_fr;
+  document.title = nom;
+  $('bannerTitle').textContent = nom;
+  $('bannerSub').textContent   = sub||'';
+  $('descText').textContent    = desc||'';
+  const ul = $('condList'); ul.innerHTML='';
+  (conds||[]).forEach(c => {
+    const li=document.createElement('li');
+    li.innerHTML=`<span class="cond-dot"></span><span>${c}</span>`;
+    ul.appendChild(li);
+  });
+  $('bannerPrice').textContent = fmt(produit.prix);
+  if (produit.prix_barre && produit.prix_barre > produit.prix) {
+    $('bannerOldPrice').textContent = fmt(produit.prix_barre);
+    $('bannerOldPrice').style.display = 'block';
+  }
+  // Badges
+  const badges = $('bannerBadges'); badges.innerHTML='';
+  (produit.badges||[]).forEach(b => {
+    const s=document.createElement('span');
+    s.className='banner-badge'+(b.accent?' accent':'');
+    s.textContent=b.texte; badges.appendChild(s);
+  });
+}
+
+/* ---- Galerie ---- */
+function buildGallery(images) {
+  if (!images||!images.length) return;
+  $('bannerImg').src = $('mainImg').src = images[0];
+  const w=$('thumbsWrap'); w.innerHTML='';
+  images.forEach((src,i)=>{
+    const d=document.createElement('div');
+    d.className='thumb'+(i===0?' active':'');
+    d.innerHTML=`<img src="${src}" alt=""/>`;
+    d.onclick=()=>selectImg(images,i);
+    w.appendChild(d);
+  });
+}
+function selectImg(images,i) {
+  $('mainImg').src=images[i];
+  document.querySelectorAll('.thumb').forEach((t,j)=>t.classList.toggle('active',j===i));
+}
+function openLightbox(src){$('lbImg').src=src;$('lightbox').classList.add('open');}
+function closeLightbox(){$('lightbox').classList.remove('open');}
+
+/* ---- Countdown ---- */
+function startCountdown(endISO) {
+  if (!endISO) return;
+  const end = new Date(endISO).getTime();
+  $('countdownWrap').style.display='block';
+  function tick() {
+    const diff = end - Date.now();
+    if (diff<=0) { $('countdownWrap').style.display='none'; return; }
+    const h=Math.floor(diff/3600000), m=Math.floor((diff%3600000)/60000), s=Math.floor((diff%60000)/1000);
+    $('cdH').textContent=String(h).padStart(2,'0');
+    $('cdM').textContent=String(m).padStart(2,'0');
+    $('cdS').textContent=String(s).padStart(2,'0');
+    setTimeout(tick,1000);
+  }
+  tick();
+}
+
+/* ---- Livraison ---- */
+function setLivraison(type) {
+  livraison=type;
+  ['domicile','bureau'].forEach(t=>{
+    $('opt-'+t).classList.toggle('selected',t===type);
+    $('dot-'+t).classList.toggle('on',t===type);
+  });
+  updateTagLabel();
+  appliquerRemiseWilaya($('wilaya').value);
+  updateRecap();
+}
+
+function updateTagLabel() {
+  const u=UI[lang], tag=$('recapTag'), wrap=$('lFraisWrap');
+  tag.textContent=livraison==='domicile'?u.domicile:u.bureau;
+  wrap.textContent=u.frais+' '; wrap.appendChild(tag);
+}
+
+/* ---- Tarif ---- */
+function getTarif(wId) {
+  if (produit.livraison_gratuite) return 0;
+  const transporteur = produit.transporteur || 'zr';
+  const t = (tarifs[transporteur]||{})[livraison]||{};
+  return t[parseInt(wId)] || t.default || 0;
+}
+
+/* ---- Remises ---- */
+function changeQty(d) {
+  quantite=Math.max(1,quantite+d);
+  $('qtyVal').textContent=quantite;
+  updateRecap();
+}
+
+function appliquerRemiseWilaya(wId) {
+  remiseWilayaVal=0;
+  if (!wId||!remises.wilaya) return;
+  const r=remises.wilaya[parseInt(wId)];
+  if (r) { const base=produit.prix*quantite; remiseWilayaVal=r.type==='pct'?(base*r.valeur/100):r.valeur; }
+}
+
+async function appliquerPromo() {
+  const code = $('promoInput').value.trim().toUpperCase();
+  const u = UI[lang];
+  $('promoOk').style.display='none';
+  $('promoErr').style.display='none';
+  if (!code) return;
+  $('promoBtn').disabled=true;
+  try {
+    const res = await fetch(`${API_URL}?action=checkPromo&code=${encodeURIComponent(code)}&produit=${encodeURIComponent(produit.code)}`);
+    const data = await res.json();
+    if (data.status==='ok') {
+      promoAppliquee={code,valeur:data.valeur,type:data.type,label:data.label};
+      $('promoOk').textContent=u.promoOk+' '+(data.label||'');
+      $('promoOk').style.display='block';
+    } else {
+      promoAppliquee=null;
+      const msgs={invalid:u.promoErrInvalid,used:u.promoErrUsed,expired:u.promoErrExpired};
+      $('promoErr').textContent=msgs[data.reason]||u.promoErrInvalid;
+      $('promoErr').style.display='block';
+    }
+  } catch(e) { $('promoErr').textContent=u.errSend; $('promoErr').style.display='block'; }
+  $('promoBtn').disabled=false;
+  updateRecap();
+}
+
+/* ---- Recap ---- */
+function updateRecap() {
+  const wId=$('wilaya').value;
+  const frais = produit.livraison_gratuite ? 0 : (wId?getTarif(wId):null);
+  const base  = produit.prix||0;
+  const st    = base*quantite;
+
+  // Remise quantité
+  let remQte=0;
+  if (remises.quantite) {
+    const rq=remises.quantite.filter(r=>quantite>=r.min_qte).sort((a,b)=>b.min_qte-a.min_qte)[0];
+    if (rq) remQte=rq.type==='pct'?(st*rq.valeur/100):rq.valeur;
+  }
+  // Remise promo
+  let remPromo=0;
+  if (promoAppliquee) {
+    remPromo=promoAppliquee.type==='pct'?((st-remQte)*promoAppliquee.valeur/100):promoAppliquee.valeur;
+  }
+  // Remise wilaya
+  appliquerRemiseWilaya(wId);
+  const remWil=remiseWilayaVal;
+
+  const totalAvantFrais=Math.max(0,st-remQte-remPromo-remWil);
+  const total=frais!==null?totalAvantFrais+frais:null;
+
+  $('recapPrix').textContent      = fmt(base)+' × '+quantite;
+  $('recapSousTotal').textContent = fmt(st);
+
+  $('rowRemiseQte').style.display  = remQte>0?'flex':'none';
+  $('recapRemiseQte').textContent  = '- '+fmt(remQte);
+  $('rowRemisePromo').style.display= remPromo>0?'flex':'none';
+  $('recapRemisePromo').textContent= '- '+fmt(remPromo);
+  $('rowRemiseWilaya').style.display=remWil>0?'flex':'none';
+  $('recapRemiseWilaya').textContent='- '+fmt(remWil);
+
+  const u=UI[lang];
+  if (produit.livraison_gratuite) {
+    $('recapFrais').textContent=u.fraisGratuit; $('recapFrais').style.color='#2e7d32';
+    $('recapTotal').textContent=fmt(totalAvantFrais);
+  } else {
+    $('recapFrais').style.color='';
+    $('recapFrais').textContent=frais!==null?fmt(frais):'— DA';
+    $('recapTotal').textContent=total!==null?fmt(total):'— DA';
+  }
+}
+
+/* ---- Wilayas / Communes ---- */
+function rebuildWilayas() {
+  const u=UI[lang], sel=$('wilaya'), cur=sel.value;
+  sel.innerHTML=`<option value="">${u.select}</option>`;
+  allWilayas.forEach(w=>{
+    const o=document.createElement('option');
+    o.value=w.id;
+    o.textContent=String(w.code||w.id).padStart(2,'0')+' - '+w.name+(w.ar_name?' - '+w.ar_name:'');
+    sel.appendChild(o);
+  });
+  if(cur) sel.value=cur;
+}
+function rebuildCommunes(wId) {
+  const u=UI[lang], sel=$('commune'), cur=sel.value;
+  const list=allCommunes.filter(c=>String(c.wilaya_id)===String(wId)).sort((a,b)=>a.name.localeCompare(b.name,'fr'));
+  sel.innerHTML=`<option value="">${u.select}</option>`;
+  list.forEach(c=>{
+    const o=document.createElement('option');
+    o.value=c.name; o.textContent=c.name+(c.ar_name?' - '+c.ar_name:'');
+    sel.appendChild(o);
+  });
+  sel.disabled=false; if(cur) sel.value=cur;
+}
+function onWilaya() {
+  const wId=$('wilaya').value, u=UI[lang];
+  if(!wId){$('commune').innerHTML=`<option value="">${u.selectW}</option>`;$('commune').disabled=true;updateRecap();return;}
+  rebuildCommunes(wId);
+  appliquerRemiseWilaya(wId);
+  updateRecap();
+}
+
+/* ---- Validation ---- */
+function showErr(id,v){$(id).style.display=v?'block':'none';}
+
+/* ---- Submit sécurisé ---- */
+async function submit() {
+  const nom=$('nom').value.trim(), prenom=$('prenom').value.trim();
+  const tel=$('tel').value.trim().replace(/\s/g,'');
+  const wSel=$('wilaya'), wId=wSel.value;
+  const wText=wSel.options[wSel.selectedIndex]?.text||'';
+  const commune=$('commune').value;
+  const u=UI[lang];
+  let ok=true;
+  showErr('errNom',   !nom);     if(!nom)    ok=false;
+  showErr('errPrenom',!prenom);  if(!prenom) ok=false;
+  const telOk=/^0[5-7]\d{8}$/.test(tel);
+  showErr('errTel',   !telOk);   if(!telOk)  ok=false;
+  showErr('errWilaya',!wId);     if(!wId)    ok=false;
+  showErr('errCommune',!commune);if(!commune) ok=false;
+  showErr('errGlobal',!ok);
+  if(!ok) return;
+
+  const frais=produit.livraison_gratuite?0:getTarif(wId);
+  const base=produit.prix, st=base*quantite;
+  let remQte=0;
+  if(remises.quantite){const rq=remises.quantite.filter(r=>quantite>=r.min_qte).sort((a,b)=>b.min_qte-a.min_qte)[0];if(rq)remQte=rq.type==='pct'?(st*rq.valeur/100):rq.valeur;}
+  const remPromo=promoAppliquee?(promoAppliquee.type==='pct'?((st-remQte)*promoAppliquee.valeur/100):promoAppliquee.valeur):0;
+  const total=Math.max(0,st-remQte-remPromo-remiseWilayaVal)+frais;
+
+  const payload={
+    action:'newOrder',
+    code_produit:produit.code,
+    nom_produit:produit.nom_fr,
+    transporteur:produit.transporteur||'zr',
+    nom,prenom,telephone:tel,wilaya:wText,wilaya_id:wId,commune,
+    quantite,livraison,
+    prix_unitaire:base,frais,
+    remise_qte:remQte,remise_promo:remPromo,remise_wilaya:remiseWilayaVal,
+    code_promo:promoAppliquee?.code||'',
+    total
+  };
+
+  const btn=$('btnSubmit');
+  btn.disabled=true;
+  btn.innerHTML=`<span class="spinner"></span>${u.sending}`;
+  try {
+    await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    $('formArea').style.display='none';
+    $('successArea').style.display='block';
+    $('successTitle').textContent=u.successTitle;
+    const fl=produit.livraison_gratuite?u.fraisGratuit:fmt(frais);
+    $('successMsg').innerHTML=`<strong>${prenom} ${nom}</strong><br>${tel}<br>${commune} — ${wText}<br>${u.qte} : <strong>${quantite}</strong><br>${u.livraison} : <strong>${livraison==='domicile'?u.domicile:u.bureau}</strong><br>${u.frais} : ${fl}<br><br><span style="font-size:16px;font-weight:700;color:var(--c-primary)">${u.total} : ${fmt(total)}</span>`;
+  } catch(e){alert(u.errSend);btn.disabled=false;btn.textContent=u.btn;}
+}
+
+/* ================================================================
+   INIT — charge le produit via ?p=CODE depuis Apps Script
+================================================================ */
+(async function init(){
+  // 1. Lire le code produit depuis l'URL
+  const params=new URLSearchParams(window.location.search);
+  const code=params.get('p')||params.get('produit');
+  if(!code){$('pageLoader').style.display='none';$('errorPage').style.display='block';return;}
+
+  try {
+    // 2. Charger produit + tarifs + remises depuis Apps Script
+    const [prodRes, wRes, cRes] = await Promise.all([
+      fetch(`${API_URL}?action=getProduit&code=${encodeURIComponent(code)}`),
+      fetch('https://raw.githubusercontent.com/Kenandarabeh/algeria-wilayas-communes-2026/main/wilayas.json'),
+      fetch('https://raw.githubusercontent.com/Kenandarabeh/algeria-wilayas-communes-2026/main/communes.json')
+    ]);
+
+    const data = await prodRes.json();
+    if(!data||data.error){$('pageLoader').style.display='none';$('errorPage').style.display='block';return;}
+
+    produit  = data.produit;
+    tarifs   = data.tarifs;
+    remises  = data.remises||{};
+    allWilayas  = (await wRes.json()).sort((a,b)=>parseInt(a.id)-parseInt(b.id));
+    allCommunes = await cRes.json();
+
+    // 3. Appliquer thème et langue par défaut du produit
+    setTheme(produit.theme||'classic');
+    lang = produit.langue_defaut||'fr';
+
+    // 4. Afficher la page
+    $('pageLoader').style.display='none';
+    $('topbar').style.display='flex';
+    $('bannerEl').style.display='block';
+    $('mainPage').style.display='block';
+
+    buildGallery(produit.images||[]);
+    if(produit.flash_sale_fin) startCountdown(produit.flash_sale_fin);
+
+    // 5. Activer/désactiver code promo
+    $('promoSection').style.display = produit.promo_active?'block':'none';
+
+    // 6. Init formulaire
+    $('codeProduit').value=produit.code;
+    $('initMsg').style.display='none';
+    $('formArea').style.display='block';
+
+    setLang(lang);
+
+  } catch(e){
+    $('loaderMsg').textContent='Erreur de chargement. Vérifiez votre connexion.';
+  }
+})();
+</script>
+</body>
+</html>
