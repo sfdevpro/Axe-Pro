@@ -359,8 +359,9 @@ function showTab(name) {
   document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
   $('tab-'+name).classList.add('active');
   event.currentTarget.classList.add('active');
-  if(name==='stats') loadStats();
+  if(name==='stats')     loadStats();
   if(name==='commandes') loadCommandes();
+  if(name==='produits')  loadProduits();
 }
 
 /* ================================================================
@@ -408,27 +409,111 @@ async function loadStats() {
 let allCommandes = [];
 
 async function loadCommandes() {
-  if(!API_URL){$('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">Configurez l\'URL API</td></tr>';return;}
-  $('commandesBody').innerHTML='<tr><td colspan="10" class="loading"><span class="spinner-sm"></span>Chargement...</td></tr>';
+  if(!API_URL){$('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">⚠️ Configurez l\'URL API dans l\'onglet Configuration</td></tr>';return;}
+  $('commandesBody').innerHTML='<tr><td colspan="10" class="loading"><span class="spinner-sm"></span>Chargement des commandes...</td></tr>';
   try {
-    const res=await fetch(`${API_URL}?action=getStats`);
-    // Pour la démo on utilise getStats — en production ajouter getCommandes dans Apps Script
-    $('commandesCount').textContent='Commandes (connecté à Sheets)';
-    $('commandesBody').innerHTML='<tr><td colspan="10" class="loading">Voir directement dans Google Sheets pour la liste complète.<br/>Le dashboard stats est chargé ci-dessus.</td></tr>';
-  } catch(e){$('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">Erreur de connexion</td></tr>';}
+    const res = await fetch(`${API_URL}?action=getCommandes`);
+    const d = await res.json();
+    allCommandes = d.commandes || [];
+    $('commandesCount').textContent = `${allCommandes.length} commande${allCommandes.length>1?'s':''}`;
+    renderCommandes(allCommandes);
+  } catch(e) {
+    $('commandesBody').innerHTML='<tr><td colspan="10" class="loading" style="color:#e53935">Erreur de connexion à l\'API</td></tr>';
+  }
+}
+
+function renderCommandes(list) {
+  const statusColors = {Nouveau:'blue', Confirmé:'green', Livré:'green', Annulé:'red', Retour:'orange'};
+  if(list.length === 0){
+    $('commandesBody').innerHTML='<tr><td colspan="10" class="loading">Aucune commande pour le moment</td></tr>';
+    return;
+  }
+  $('commandesBody').innerHTML = list.map(c => `<tr>
+    <td><code style="font-size:11px">${c.order_id||''}</code></td>
+    <td style="font-size:12px;white-space:nowrap">${c.date||''}</td>
+    <td style="font-size:12px">${c.nom_produit||c.code_produit||''}</td>
+    <td><strong>${c.prenom||''} ${c.nom||''}</strong></td>
+    <td>${c.telephone||''}</td>
+    <td style="font-size:12px">${(c.wilaya||'').split(' - ')[0]||c.wilaya||''}</td>
+    <td style="text-align:center"><strong>${c.quantite||1}</strong></td>
+    <td><span class="badge gray" style="font-size:10px">${c.livraison||''}</span></td>
+    <td><strong style="color:#16a34a">${parseFloat(c.total||0).toLocaleString('fr-DZ')} DA</strong></td>
+    <td><span class="badge ${statusColors[c.statut]||'blue'}">${c.statut||'Nouveau'}</span></td>
+  </tr>`).join('');
 }
 
 function filterCommandes(q) {
-  const rows=document.querySelectorAll('#commandesBody tr');
-  rows.forEach(r=>{ r.style.display=r.textContent.toLowerCase().includes(q.toLowerCase())?'':'none'; });
+  if(!q){renderCommandes(allCommandes);return;}
+  const filtered = allCommandes.filter(c =>
+    JSON.stringify(c).toLowerCase().includes(q.toLowerCase())
+  );
+  renderCommandes(filtered);
 }
 
 /* ================================================================
-   PRODUITS (lecture/écriture via Apps Script)
+   PRODUITS
 ================================================================ */
+async function loadProduits() {
+  if(!API_URL){$('produitsBody').innerHTML='<tr><td colspan="7" class="loading" style="color:#e53935">⚠️ Configurez l\'URL API dans l\'onglet Configuration</td></tr>';return;}
+  $('produitsBody').innerHTML='<tr><td colspan="7" class="loading"><span class="spinner-sm"></span>Chargement des produits...</td></tr>';
+  try {
+    const res = await fetch(`${API_URL}?action=getProduits`);
+    const d = await res.json();
+    const list = d.produits || [];
+    if(list.length === 0){
+      $('produitsBody').innerHTML='<tr><td colspan="7" class="loading">Aucun produit dans Sheets</td></tr>';
+      return;
+    }
+    $('produitsBody').innerHTML = list.map(p => {
+      const actif = p.actif==='TRUE'||p.actif===true||p.actif==='true';
+      return `<tr>
+        <td><code style="font-weight:700">${p.code||''}</code></td>
+        <td>${p.nom_fr||''}</td>
+        <td><strong>${parseFloat(p.prix||0).toLocaleString('fr-DZ')} DA</strong></td>
+        <td><span class="badge gray">${p.transporteur||'zr'}</span></td>
+        <td><span class="badge blue">${p.theme||'classic'}</span></td>
+        <td><span class="badge ${actif?'green':'gray'}">${actif?'Actif':'Inactif'}</span></td>
+        <td>
+          <button class="btn btn-outline btn-sm" onclick="copyProduitLink('${p.code}')">🔗</button>
+          <button class="btn btn-outline btn-sm" onclick="editProduit(${JSON.stringify(p).replace(/"/g,'&quot;')})" style="margin-left:4px">✏️</button>
+        </td>
+      </tr>`;
+    }).join('');
+  } catch(e) {
+    $('produitsBody').innerHTML='<tr><td colspan="7" class="loading" style="color:#e53935">Erreur de connexion à l\'API</td></tr>';
+  }
+}
+
+function editProduit(p) {
+  $('p_code').value      = p.code||'';
+  $('p_prix').value      = p.prix||'';
+  $('p_nom_fr').value    = p.nom_fr||'';
+  $('p_nom_ar').value    = p.nom_ar||'';
+  $('p_sub_fr').value    = p.sous_titre_fr||'';
+  $('p_sub_ar').value    = p.sous_titre_ar||'';
+  $('p_desc_fr').value   = p.description_fr||'';
+  $('p_desc_ar').value   = p.description_ar||'';
+  $('p_conds_fr').value  = p.conditions_fr||'';
+  $('p_conds_ar').value  = p.conditions_ar||'';
+  $('p_images').value    = p.images||'';
+  $('p_prix_barre').value= p.prix_barre||'';
+  $('p_transporteur').value = p.transporteur||'zr';
+  $('p_theme').value     = p.theme||'classic';
+  $('p_langue').value    = p.langue_defaut||'fr';
+  $('p_flash').value     = p.flash_sale_fin||'';
+  const actif = p.actif==='TRUE'||p.actif===true;
+  const liv = p.livraison_gratuite==='TRUE'||p.livraison_gratuite===true;
+  const promo = p.promo_active==='TRUE'||p.promo_active===true;
+  toggleStates.actif=actif; $('tgl_actif').classList.toggle('on',actif);
+  toggleStates.liv_gratuite=liv; $('tgl_liv_gratuite').classList.toggle('on',liv);
+  toggleStates.promo_active=promo; $('tgl_promo_active').classList.toggle('on',promo);
+  window.scrollTo({top:0,behavior:'smooth'});
+  showAlert('alertProduit','success','✏️ Produit chargé — modifiez puis cliquez Enregistrer.');
+}
+
 function resetProduit() {
   ['p_code','p_prix','p_nom_fr','p_nom_ar','p_sub_fr','p_sub_ar',
-   'p_desc_fr','p_desc_ar','p_conds_fr','p_conds_ar','p_images','p_prix_barre'].forEach(id=>{$(id).value='';});
+   'p_desc_fr','p_desc_ar','p_conds_fr','p_conds_ar','p_images','p_prix_barre','p_flash'].forEach(id=>{$(id).value='';});
   ['actif','liv_gratuite','promo_active'].forEach(id=>{toggleStates[id]=false;$('tgl_'+id).classList.remove('on');});
 }
 
@@ -437,7 +522,6 @@ function saveProduit() {
   if(!code||!$('p_prix').value||!$('p_nom_fr').value){
     showAlert('alertProduit','error','Remplissez au moins le code, le prix et le nom FR.');return;
   }
-  // Construction de la ligne à ajouter dans Sheets
   const row=[
     code,$('p_nom_fr').value,$('p_nom_ar').value,
     $('p_sub_fr').value,$('p_sub_ar').value,
@@ -452,21 +536,8 @@ function saveProduit() {
     $('p_flash').value||'',
     toggleStates.actif
   ];
-  // Afficher la ligne à copier dans Sheets
-  showAlert('alertProduit','success',`✅ Données prêtes ! Ajoutez cette ligne dans la feuille "Produits" de votre Google Sheets.\nLien produit : index.html?p=${code}`);
-
-  // Optionnel : copier dans le presse-papiers
   navigator.clipboard.writeText(row.join('\t')).catch(()=>{});
-
-  // Ajouter dans le tableau local
-  const tbody=$('produitsBody');
-  if(tbody.querySelector('.loading')) tbody.innerHTML='';
-  const tr=document.createElement('tr');
-  tr.innerHTML=`<td><code>${code}</code></td><td>${$('p_nom_fr').value}</td><td><strong>${parseFloat($('p_prix').value).toLocaleString('fr-DZ')} DA</strong></td>
-    <td>${$('p_transporteur').value}</td><td>${$('p_theme').value}</td>
-    <td><span class="badge ${toggleStates.actif?'green':'gray'}">${toggleStates.actif?'Actif':'Inactif'}</span></td>
-    <td><button class="btn btn-outline btn-sm" onclick="copyProduitLink('${code}')">🔗</button></td>`;
-  tbody.prepend(tr);
+  showAlert('alertProduit','success',`✅ Ligne copiée ! Collez-la dans la feuille "Produits" de Google Sheets. Lien : index.html?p=${code}`);
 }
 
 function copyLink(){
