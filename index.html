@@ -216,22 +216,20 @@
 
     /* ===== LAYOUT PC PLEINE LARGEUR ===== */
     @media(min-width: 768px) {
-      body { background: #e8e8e8; }
+      #mainPage { max-width: 100% !important; margin: 0 !important; }
 
-      #mainPage {
-        max-width: 680px !important;
-        margin: 0 auto !important;
-        box-shadow: 0 0 40px rgba(0,0,0,0.12);
-      }
+      .product-img img { height: 500px; }
 
-      .product-img img { height: 420px; }
+      .thumbs-row { padding: 12px 24px; gap: 10px; }
+      .thumb { width: 70px; height: 70px; }
 
-      .thumbs-row {
-        display: flex; gap: 8px; padding: 12px 16px;
-      }
-      .thumb { width: 64px; height: 64px; }
+      .product-info { padding: 20px 24px; }
+      .product-name { font-size: 20px; }
+      .price-main { font-size: 30px; }
 
-      .t-card { margin-bottom: 4px; }
+      .t-card { padding: 20px 24px; }
+      .info-section { padding: 20px 24px; }
+      .countdown-inner { font-size: 13px; }
     }
 
     @media(max-width: 480px) {
