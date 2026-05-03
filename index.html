@@ -4,6 +4,15 @@
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Chargement...</title>
+
+  <!-- Google Analytics GA4 — remplace G-XXXXXXXXXX par ton ID -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-P5LLTCL221');
+  </script>
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -366,7 +375,7 @@
         <div class="err" id="errWilaya"></div>
       </div>
       <div class="field">
-        <label id="lCommune">Commune <span class="req">*</span></label>
+        <label id="lCommune">Commune</label>
         <select id="commune" disabled><option value="">—</option></select>
         <div class="err" id="errCommune"></div>
       </div>
@@ -602,7 +611,7 @@ function setLang(l){
   $('lPrenom').innerHTML      =u.prenom+' <span class="req">*</span>';
   $('lTel').innerHTML         =u.tel+' <span class="req">*</span>';
   $('lWilaya').innerHTML      =u.wilaya+' <span class="req">*</span>';
-  $('lCommune').innerHTML     =u.commune+' <span class="req">*</span>';
+  $('lCommune').textContent   =u.commune;
   $('lLivraison').textContent =u.livraison;
   $('txtDomicile').textContent=u.domicile;
   $('txtBureau').textContent  =u.bureau;
@@ -772,17 +781,21 @@ function showErr(id,v){$(id).style.display=v?'block':'none';}
 /* ---- Submit ---- */
 async function submit(){
   const nom=$('nom').value.trim(),prenom=$('prenom').value.trim();
-  const tel=$('tel').value.trim().replace(/\s/g,'');
+  // Nettoyer le tel : garder uniquement chiffres et +
+  const telRaw=$('tel').value.trim();
+  const tel=telRaw.replace(/[^0-9+]/g,'');
   const wSel=$('wilaya'),wId=wSel.value;
   const wText=wSel.options[wSel.selectedIndex]?.text||'';
   const commune=$('commune').value,u=UI[lang];
   let ok=true;
   showErr('errNom',!nom);      if(!nom)    ok=false;
   showErr('errPrenom',!prenom);if(!prenom) ok=false;
-  const telOk=/^0[5-7]\d{8}$/.test(tel);
+  // Téléphone : minimum 8 chiffres, accepte tout format sauf lettres/caractères spéciaux
+  const telOk=tel.replace(/\+/g,'').length>=8;
   showErr('errTel',!telOk);    if(!telOk)  ok=false;
   showErr('errWilaya',!wId);   if(!wId)    ok=false;
-  showErr('errCommune',!commune);if(!commune) ok=false;
+  // Commune : non obligatoire — on efface l'erreur si présente
+  showErr('errCommune',false);
   showErr('errGlobal',!ok);
   if(!ok) return;
   const frais=produit.livraison_gratuite?0:getTarif(wId);
@@ -801,6 +814,16 @@ async function submit(){
   const btn=$('btnSubmit');
   btn.disabled=true;
   btn.innerHTML=`<span class="spinner"></span>${u.sending}`;
+
+  // GA4 — événement begin_checkout
+  if(typeof gtag!=='undefined'){
+    gtag('event','begin_checkout',{
+      currency:'DZD',
+      value:total,
+      items:[{item_id:produit.code,item_name:produit.nom_fr,price:base,quantity:quantite}]
+    });
+  }
+
   try{
     await fetch(API_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
     $('formArea').style.display='none';
@@ -811,7 +834,31 @@ async function submit(){
     $('successArea').style.display='block';
     $('successTitle').textContent=u.successTitle;
     const fl=produit.livraison_gratuite?u.fraisGratuit:fmt(frais);
-    $('successMsg').innerHTML=`<strong>${prenom} ${nom}</strong><br>${tel}<br>${commune} — ${wText}<br>${u.qte} : <strong>${quantite}</strong><br>${u.livraison} : <strong>${livraison==='domicile'?u.domicile:u.bureau}</strong><br>${u.frais} : ${fl}<br><br><strong style="color:#ff4747;font-size:16px">${u.total} : ${fmt(total)}</strong>`;
+    $('successMsg').innerHTML=`<strong>${prenom} ${nom}</strong><br>${tel}<br>${commune?commune+' — ':''} ${wText}<br>${u.qte} : <strong>${quantite}</strong><br>${u.livraison} : <strong>${livraison==='domicile'?u.domicile:u.bureau}</strong><br>${u.frais} : ${fl}<br><br><strong style="color:#ff4747;font-size:16px">${u.total} : ${fmt(total)}</strong>`;
+
+    // GA4 — événement purchase (commande confirmée)
+    if(typeof gtag!=='undefined'){
+      gtag('event','purchase',{
+        transaction_id: 'ORD-'+Date.now(),
+        currency:       'DZD',
+        value:          total,
+        shipping:       frais,
+        items:[{
+          item_id:       produit.code,
+          item_name:     produit.nom_fr,
+          price:         base,
+          quantity:      quantite
+        }]
+      });
+      // Événement personnalisé wilaya
+      gtag('event','commande_wilaya',{
+        wilaya:   wText,
+        wilaya_id:wId,
+        livraison:livraison,
+        value:    total
+      });
+    }
+
   }catch(e){alert(u.errSend);btn.disabled=false;btn.textContent=u.btn;}
 }
 
@@ -842,6 +889,15 @@ async function submit(){
     $('initMsg').style.display='none';
     $('formArea').style.display='block';
     setLang(lang);
+
+    // GA4 — événement vue produit
+    if(typeof gtag!=='undefined'){
+      gtag('event','view_item',{
+        currency:'DZD',
+        value: produit.prix,
+        items:[{item_id:produit.code, item_name:produit.nom_fr, price:produit.prix}]
+      });
+    }
   }catch(e){
     $('loaderMsg').textContent='Erreur de chargement.';
   }
