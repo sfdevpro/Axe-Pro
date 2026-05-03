@@ -783,7 +783,7 @@ async function submit(){
   const nom=$('nom').value.trim(),prenom=$('prenom').value.trim();
   // Nettoyer le tel : garder uniquement chiffres et +
   const telRaw=$('tel').value.trim();
-  const tel=telRaw.replace(/[^0-9+]/g,'');
+  const tel=telRaw.replace(/[^0-9+ ]/g,'');
   const wSel=$('wilaya'),wId=wSel.value;
   const wText=wSel.options[wSel.selectedIndex]?.text||'';
   const commune=$('commune').value,u=UI[lang];
