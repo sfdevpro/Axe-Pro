@@ -791,7 +791,7 @@ async function submit(){
   showErr('errNom',!nom);      if(!nom)    ok=false;
   showErr('errPrenom',!prenom);if(!prenom) ok=false;
   // Téléphone : minimum 8 chiffres, accepte tout format sauf lettres/caractères spéciaux
-  const telOk=tel.replace(/\+/g,'').length>=8;
+  const telOk=tel.replace(/\+/g,'').length>=6;
   showErr('errTel',!telOk);    if(!telOk)  ok=false;
   showErr('errWilaya',!wId);   if(!wId)    ok=false;
   // Commune : non obligatoire — on efface l'erreur si présente
